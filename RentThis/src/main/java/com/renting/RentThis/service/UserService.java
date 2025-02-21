@@ -17,13 +17,11 @@ public class UserService {
 
         if(userRepository.existsByEmail(request.getEmail())){
             throw new RuntimeException("Email already exist");
-
         }
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
-
         User savedUser = userRepository.save(user);
 
         return UserResponse.builder()
