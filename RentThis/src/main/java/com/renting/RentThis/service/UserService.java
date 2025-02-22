@@ -5,7 +5,6 @@ import com.renting.RentThis.dto.response.UserResponse;
 import com.renting.RentThis.entity.User;
 import com.renting.RentThis.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
