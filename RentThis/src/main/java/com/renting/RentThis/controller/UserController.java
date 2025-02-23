@@ -1,6 +1,8 @@
 package com.renting.RentThis.controller;
+import com.renting.RentThis.dto.request.LoginRequest;
 import com.renting.RentThis.dto.request.UserRegistrationRequest;
 import com.renting.RentThis.dto.response.ApiResponse;
+import com.renting.RentThis.dto.response.LoginResponse;
 import com.renting.RentThis.dto.response.UserResponse;
 import com.renting.RentThis.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +30,15 @@ public class UserController {
                 .data(user)
                 .build()
         );
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse <LoginResponse>> loginUser(@RequestBody LoginRequest request){
+        LoginResponse response = userService.loginUser(request);
+
+        return ResponseEntity.ok(ApiResponse.<LoginResponse>builder()
+                .success(true)
+                .data(response)
+                .build());
     }
 }
