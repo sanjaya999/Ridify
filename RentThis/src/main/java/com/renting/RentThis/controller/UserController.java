@@ -7,11 +7,9 @@ import com.renting.RentThis.dto.response.UserResponse;
 import com.renting.RentThis.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -22,12 +20,14 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<ApiResponse <UserResponse>> registerUser(@RequestBody UserRegistrationRequest request){
         UserResponse user = userService.registerUser(request);
 
         return ResponseEntity.ok(ApiResponse.<UserResponse>builder()
                 .success(true)
                 .data(user)
+                .status(200)
                 .build()
         );
     }
