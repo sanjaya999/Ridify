@@ -1,0 +1,22 @@
+
+<------------------------------------------------this is demo and doesnot reflect actual env--------------------------------------->
+
+
+
+
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/Rent
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+jwt.access.secret=Secret
+jwt.access.expiration=886400000
+
+
+
+# Refresh Token - 7 days
+jwt.refresh.secret=Secret
+jwt.refresh.expiration=1504800000
