@@ -5,6 +5,7 @@ import com.renting.RentThis.dto.response.ApiResponse;
 import com.renting.RentThis.dto.response.LoginResponse;
 import com.renting.RentThis.dto.response.UserResponse;
 import com.renting.RentThis.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class UserController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<ApiResponse <UserResponse>> registerUser(@RequestBody UserRegistrationRequest request){
+    public ResponseEntity<ApiResponse <UserResponse>> registerUser(@Valid @RequestBody UserRegistrationRequest request){
         UserResponse user = userService.registerUser(request);
 
         return ResponseEntity.ok(ApiResponse.<UserResponse>builder()
