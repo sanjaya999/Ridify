@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse <LoginResponse>> loginUser(@RequestBody LoginRequest request){
+    public ResponseEntity<ApiResponse <LoginResponse>> loginUser(@RequestBody @Valid LoginRequest request){
         LoginResponse response = userService.loginUser(request);
 
         return ResponseEntity.ok(ApiResponse.<LoginResponse>builder()
