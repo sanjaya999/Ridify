@@ -37,6 +37,7 @@ public class UserService {
                 .id(savedUser.getId())
                 .email(savedUser.getEmail())
                 .name(savedUser.getName())
+                .message("user created successfully")
                 .build();
     }
     public LoginResponse loginUser(LoginRequest request){
