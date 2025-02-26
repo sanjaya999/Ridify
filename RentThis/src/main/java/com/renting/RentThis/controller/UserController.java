@@ -40,6 +40,7 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.<LoginResponse>builder()
                 .success(true)
                 .data(response)
+                        .status(200)
                 .build());
     }
 }
