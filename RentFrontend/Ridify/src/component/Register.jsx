@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import {post} from "../api/api.js"
 
 const Register = () => {
   const navigate = useNavigate();
@@ -7,9 +8,8 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,36 +19,52 @@ const Register = () => {
     });
   };
 
-  const validateForm = () => {
-    let tempErrors = {};
+  // const validateForm = () => {
+  //   let tempErrors = {};
     
-    if (!formData.name) tempErrors.name = "Name is required";
+  //   if (!formData.name) tempErrors.name = "Name is required";
     
-    if (!formData.email) tempErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) tempErrors.email = "Email is invalid";
+  //   if (!formData.email) tempErrors.email = "Email is required";
+  //   else if (!/\S+@\S+\.\S+/.test(formData.email)) tempErrors.email = "Email is invalid";
     
-    if (!formData.password) tempErrors.password = "Password is required";
-    else if (formData.password.length < 6) tempErrors.password = "Password must be at least 6 characters";
+  //   if (!formData.password) tempErrors.password = "Password is required";
+  //   else if (formData.password.length < 6) tempErrors.password = "Password must be at least 6 characters";
     
-    if (!formData.confirmPassword) tempErrors.confirmPassword = "Please confirm your password";
-    else if (formData.confirmPassword !== formData.password) tempErrors.confirmPassword = "Passwords do not match";
+  //   if (!formData.confirmPassword) tempErrors.confirmPassword = "Please confirm your password";
+  //   else if (formData.confirmPassword !== formData.password) tempErrors.confirmPassword = "Passwords do not match";
     
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0;
-  };
+  //   setErrors(tempErrors);
+  //   return Object.keys(tempErrors).length === 0;
+  // };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      // Here you would typically handle the API call to register the user
-      console.log("Registration form submitted:", formData);
-      
-      // Redirect to login page after successful registration
-      navigate('/login', { state: { message: 'Registration successful! Please login.' } });
+   
+    try {
+      const response = await post(`/users/register` , formData);
+      console.log(response);
+      const inc = response?.data?.message
+      if(inc.includes("user created successfully")){
+        navigate('/login', { state: { message: 'Registration successful! Please login.' } });
+        setErrors("success")
+      }
+    } catch (error) {
+      const recievedError = error.response.data
+      if(recievedError.message.includes("Email already exist")){
+        setErrors("Email already exist")
+      }else{
+        setErrors(recievedError.message)
+      }
     }
+      
+    
   };
 
   return (
+
+    <>
+    {errors && <span> {errors}</span>}
+
     <div className="register-form-container">
     <h2>Create Account</h2>
     <form onSubmit={handleSubmit} className="register-form">
@@ -91,7 +107,7 @@ const Register = () => {
         {errors.password && <span className="register-error-message">{errors.password}</span>}
       </div>
       
-      <div className="register-form-group">
+      {/* <div className="register-form-group">
         <label htmlFor="confirmPassword">Confirm Password</label>
         <input
           type="password"
@@ -102,7 +118,7 @@ const Register = () => {
           placeholder="********"
         />
         {errors.confirmPassword && <span className="register-error-message">{errors.confirmPassword}</span>}
-      </div>
+      </div> */}
       
       <button type="submit" className="register-button">Register</button>
     </form>
@@ -114,6 +130,7 @@ const Register = () => {
       </NavLink>
     </p>
   </div>
+  </>
   );
 };
 
