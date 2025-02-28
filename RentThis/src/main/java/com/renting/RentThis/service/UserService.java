@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -52,6 +54,12 @@ public class UserService {
         }
 
         tokenRepository.deleteByUser(user);
+
+        var userDetails = new org.springframework.security.core.userdetails.User(
+                user.getEmail(),  // Using email instead of username
+                user.getPassword(),
+                new ArrayList<>()
+        );
 
         String accessToken = jwtService.generateAccessToken(user.getId() , user.getEmail());
         String refreshToken = jwtService.generateRefreshToken(user.getId(),  user.getEmail());
