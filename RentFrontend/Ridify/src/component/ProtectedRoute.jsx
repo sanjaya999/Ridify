@@ -2,9 +2,9 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ children }) => {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const token = localStorage.getItem('accessToken') 
   
-  if (!user.isAuthenticated) {
+  if (!token) {
     // Redirect to login if not authenticated
     return <Navigate to="/login" replace />;
   }
