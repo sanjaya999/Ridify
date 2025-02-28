@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-
+import {post } from "../api/api.js"
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,33 +17,47 @@ const Login = () => {
     });
   };
 
-  const validateForm = () => {
-    let tempErrors = {};
-    if (!formData.email) tempErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) tempErrors.email = "Email is invalid";
+  // const validateForm = () => {
+  //   let tempErrors = {};
+  //   if (!formData.email) tempErrors.email = "Email is required";
+  //   else if (!/\S+@\S+\.\S+/.test(formData.email)) tempErrors.email = "Email is invalid";
     
-    if (!formData.password) tempErrors.password = "Password is required";
-    else if (formData.password.length < 6) tempErrors.password = "Password must be at least 6 characters";
+  //   if (!formData.password) tempErrors.password = "Password is required";
+  //   else if (formData.password.length < 6) tempErrors.password = "Password must be at least 6 characters";
     
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).length === 0;
-  };
+  //   setErrors(tempErrors);
+  //   return Object.keys(tempErrors).length === 0;
+  // };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      // Here you would typically handle the API call to authenticate
-      console.log("Login form submitted:", formData);
-      
-      // Mock successful login - set user in localStorage
-      localStorage.setItem('user', JSON.stringify({ email: formData.email, isAuthenticated: true }));
-      
-      // Redirect to home page
-      navigate('/home');
+    
+  try {
+     const response = await post(`/users/login`  , formData)
+     console.log(response.success);
+     
+      if(response.success){
+        navigate('/home');
+        localStorage.setItem('user', response.data.id);
+        localStorage.setItem('accessToken', response.data.accessToken );
+        localStorage.setItem('refresh', response.data.refreshToken);
+
+      }
+  } catch (error) {
+    const recievedError = error?.response?.data
+    if(recievedError){
+      setErrors(recievedError?.message );
     }
+    
+  }
+          
+
+    
   };
 
   return (
+    <>
+    {errors && <span >{errors}</span>}
     <div className="login-form-container">
       <h2>Login</h2>
       <form onSubmit={handleSubmit} className="login-form">
@@ -57,7 +71,6 @@ const Login = () => {
             onChange={handleChange}
             placeholder="your@email.com"
           />
-          {errors.email && <span className="login-error-message">{errors.email}</span>}
         </div>
         
         <div className="login-form-group">
@@ -70,7 +83,6 @@ const Login = () => {
             onChange={handleChange}
             placeholder="********"
           />
-          {errors.password && <span className="login-error-message">{errors.password}</span>}
         </div>
         
         <button type="submit" className="login-button">Login</button>
@@ -83,6 +95,7 @@ const Login = () => {
         </NavLink>
       </p>
     </div>
+    </>
   );
 };
 
