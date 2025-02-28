@@ -4,6 +4,7 @@ import com.renting.RentThis.dto.request.UserRegistrationRequest;
 import com.renting.RentThis.dto.response.ApiResponse;
 import com.renting.RentThis.dto.response.LoginResponse;
 import com.renting.RentThis.dto.response.UserResponse;
+import com.renting.RentThis.service.JwtService;
 import com.renting.RentThis.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,4 +44,5 @@ public class UserController {
                         .status(200)
                 .build());
     }
+
 }
