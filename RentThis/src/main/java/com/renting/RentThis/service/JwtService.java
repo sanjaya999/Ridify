@@ -46,18 +46,19 @@ public class JwtService {
                 .getBody();
     }
 
-    public String generateAccessToken(Long userId, String email) {
-        return generateToken(userId, email, accessSecret, accessExpiration);
+    public String generateAccessToken(Long userId, String email , String role) {
+        return generateToken(userId, email,role, accessSecret, accessExpiration);
     }
 
-    public String generateRefreshToken(Long userId, String email) {
-        return generateToken(userId, email, refreshSecret, refreshExpiration);
+    public String generateRefreshToken(Long userId, String email ,  String role) {
+        return generateToken(userId, email,role, refreshSecret, refreshExpiration);
     }
 
-    public String generateToken(Long userId, String email, String secret, Long expiration) {
+    public String generateToken(Long userId, String email,String role, String secret, Long expiration) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("email", email);
+        claims.put("role", role);
 
         return Jwts.builder()
                 .setClaims(claims)
