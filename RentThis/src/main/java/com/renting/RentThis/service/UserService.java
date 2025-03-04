@@ -29,6 +29,7 @@ public class UserService {
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
+        user.setRole(request.getRole());
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         user.setPassword(encodedPassword);
         User savedUser = userRepository.save(user);
@@ -61,14 +62,15 @@ public class UserService {
                 new ArrayList<>()
         );
 
-        String accessToken = jwtService.generateAccessToken(user.getId() , user.getEmail());
-        String refreshToken = jwtService.generateRefreshToken(user.getId(),  user.getEmail());
+        String accessToken = jwtService.generateAccessToken(user.getId() , user.getEmail(), user.getRole());
+        String refreshToken = jwtService.generateRefreshToken(user.getId(),  user.getEmail(), user.getRole());
 
 
         return LoginResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
+                .role(user.getRole())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
