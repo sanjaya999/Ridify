@@ -18,4 +18,7 @@ public class UserRegistrationRequest {
 
     @NotBlank(message = "password")
     private String password;
+
+    @NotBlank(message =  "Please specify your role")
+    private String role;
 }
