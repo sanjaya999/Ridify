@@ -19,3 +19,7 @@ jwt.access.expiration=886400000
 # Refresh Token - 7 days
 jwt.refresh.secret=Secret
 jwt.refresh.expiration=1504800000
+
+
+spring.web.resources.static-locations=file:uploads/
+spring.servlet.multipart.enabled=true
