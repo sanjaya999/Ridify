@@ -1,6 +1,8 @@
 package com.renting.RentThis.controller;
 
 import com.renting.RentThis.dto.request.VehicleRequest;
+import com.renting.RentThis.dto.response.ApiResponse;
+import com.renting.RentThis.dto.response.UserResponse;
 import com.renting.RentThis.dto.response.VehicleResponse;
 import com.renting.RentThis.service.VehicleService;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +20,14 @@ public class VehicleController {
 
     @PreAuthorize("hasRole('admin')")
     @PostMapping("/add")
-    public ResponseEntity<VehicleResponse> addVehicle(@ModelAttribute VehicleRequest request , @RequestParam("photo")MultipartFile photo){
+    public ResponseEntity<ApiResponse<VehicleResponse>> addVehicle(@ModelAttribute VehicleRequest request , @RequestParam("photo")MultipartFile photo){
             VehicleResponse vehicleResponse = vehicleService.addVehicle(request , photo);
-            return  new ResponseEntity<>(vehicleResponse , HttpStatus.CREATED);
-
+        return ResponseEntity.ok(ApiResponse.<VehicleResponse>builder()
+                .success(true)
+                .data(vehicleResponse)
+                .status(200)
+                .build()
+        );
     }
 
 
