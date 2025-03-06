@@ -12,19 +12,31 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/admin/vehicles")
+@RequestMapping("/vehicles")
 @RequiredArgsConstructor
 public class VehicleController {
     private final VehicleService vehicleService;
 
     @PreAuthorize("hasRole('admin')")
-    @PostMapping("/add")
+    @PostMapping("/admin/add")
     public ResponseEntity<ApiResponse<VehicleResponse>> addVehicle(@ModelAttribute VehicleRequest request , @RequestParam("photo")MultipartFile photo){
             VehicleResponse vehicleResponse = vehicleService.addVehicle(request , photo);
         return ResponseEntity.ok(ApiResponse.<VehicleResponse>builder()
                 .success(true)
                 .data(vehicleResponse)
+                .status(200)
+                .build()
+        );
+    }
+    @GetMapping("/getAll")
+    public ResponseEntity<ApiResponse<List<VehicleResponse>>>getAllVehicle(){
+        List<VehicleResponse> vehicles = vehicleService.getAllVehicle();
+        return ResponseEntity.ok(ApiResponse.<List<VehicleResponse>>builder()
+                .success(true)
+                .data(vehicles)
                 .status(200)
                 .build()
         );
