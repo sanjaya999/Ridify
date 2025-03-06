@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/v1/users/**").permitAll()
+                            .requestMatchers("/uploads/**").permitAll()
                             .requestMatchers("/admin/**").hasRole("admin")
                             .anyRequest().authenticated();
                 })
