@@ -15,6 +15,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class VehicleService {
 
@@ -56,8 +59,29 @@ public class VehicleService {
                 .type(savedVehicle.getType())
                 .plateNum(savedVehicle.getPlate_num())
                 .photoUrl(savedVehicle.getPhotoUrl())
+                .ownerName(savedVehicle.getOwner_id().getName())
                 .build();
 
+
+    }
+
+    public List<VehicleResponse> getAllVehicle(){
+        List<Vehicle> vehicles = vehicleRepository.findAll();
+
+        List<VehicleResponse> responseList = vehicles.stream()
+                .map(vehicle -> VehicleResponse.builder()
+                        .id(vehicle.getId())
+                        .name(vehicle.getName())
+                        .model(vehicle.getModel())
+                        .type(vehicle.getType())
+                        .plateNum(vehicle.getPlate_num())
+                        .photoUrl(vehicle.getPhotoUrl())
+                        .ownerName(vehicle.getOwner_id().getName())
+                        .build())
+                .collect(Collectors.toList());
+
+
+        return responseList;
 
     }
 
