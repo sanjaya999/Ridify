@@ -8,6 +8,7 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
+    role: "customer"
   });
   const [errors, setErrors] = useState("");
 
@@ -17,6 +18,7 @@ const Register = () => {
       ...formData,
       [name]: value
     });
+    
   };
 
   // const validateForm = () => {
@@ -119,6 +121,20 @@ const Register = () => {
         />
         {errors.confirmPassword && <span className="register-error-message">{errors.confirmPassword}</span>}
       </div> */}
+
+      <div className="register-form-group">
+        <label htmlFor="role">Role</label>
+        <select
+          id="role"
+          name="role"
+          value={formData.role}
+          onChange={handleChange}
+        >
+          <option value="customer">Customer</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      
       
       <button type="submit" className="register-button">Register</button>
     </form>
