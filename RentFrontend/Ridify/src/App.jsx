@@ -45,8 +45,16 @@ function App() {
                 )
               }
             />
-            <Route path="/register" element={<Register />} />
-            <Route
+              <Route
+              path="/register"
+              element={
+                localStorage.getItem("accessToken") ? (
+                  <Navigate to="/home" replace />
+                ) : (
+                  <Register />
+                )
+              }
+            />            <Route
               path="/home"
               element={
                 <ProtectedRoute>
