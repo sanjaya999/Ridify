@@ -9,16 +9,19 @@ import {
 import Login from "./component/Login.jsx";
 import Register from "./component/Register.jsx";
 import Home from "./component/Home.jsx";
+import Landing from "./component/Landing.jsx";
+import Contact from "./component/Contact.jsx";
 import ProtectedRoute from "./component/ProtectedRoute.jsx";
+import Layout from "./Layout.jsx";
 import "./Style/Login.css";
 import "./Style/Register.css";
 import "./Style/Home.css";
+import "./Style/Landing.css";
+import "./Style/Contact.css";
 
-// Message component for displaying redirects
 const Message = () => {
   const location = useLocation();
   const message = location.state?.message;
-
   if (!message) return null;
 
   return (
@@ -31,9 +34,9 @@ const Message = () => {
 function App() {
   return (
     <Router>
-      <div className="app">
+      <div>
         <Message />
-        <div className="auth-container">
+        <div >
           <Routes>
             <Route
               path="/login"
@@ -45,7 +48,7 @@ function App() {
                 )
               }
             />
-              <Route
+            <Route
               path="/register"
               element={
                 localStorage.getItem("accessToken") ? (
@@ -54,18 +57,22 @@ function App() {
                   <Register />
                 )
               }
-            />            <Route
-              path="/home"
-              element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              }
             />
-            {/* Redirect to login by default */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            {/* catch invalid route */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
+
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Landing />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route
+                path="/home"
+                element={
+                  <ProtectedRoute>
+                    <Home />
+                  </ProtectedRoute>
+                }
+              />
+            </Route>
+
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </div>
