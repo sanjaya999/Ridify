@@ -6,6 +6,8 @@
     width: 100%;
     max-width: 800px;
     animation: homeFadeIn 0.7s ease-out;
+    margin: 20px auto; /* Center the container and add margin */
+    min-height: 70vh; /* Ensure minimum height to push footer down */
   }
   
   .home-header {
