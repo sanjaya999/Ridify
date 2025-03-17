@@ -13,7 +13,7 @@ export default function Nav() {
           {isOpen ? "✖" : "☰"}
         </button>
         <div className={`nav-links ${isOpen ? "open" : ""}`}>
-          <Link to="/" className="nav-item">Home</Link>
+          <Link to="/Home" className="nav-item">Home</Link>
           <Link to="/about" className="nav-item">About</Link>
           <Link to="/services" className="nav-item">Services</Link>
           <Link to="/contact" className="nav-item">Contact</Link>
