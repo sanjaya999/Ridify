@@ -43,7 +43,7 @@ const Register = () => {
     e.preventDefault();
    
     try {
-      const response = await post(`/users/register` , formData);
+      const response = await post(`api/v1/users/register` , formData);
       console.log(response);
       const inc = response?.data?.message
       if(inc.includes("user created successfully")){
