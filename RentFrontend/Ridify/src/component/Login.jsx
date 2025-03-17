@@ -33,7 +33,7 @@ const Login = () => {
     e.preventDefault();
     
   try {
-     const response = await post(`/users/login`  , formData)
+     const response = await post(`api/v1/users/login`  , formData)
      console.log(response.success);
      
       if(response.success){
