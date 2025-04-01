@@ -11,11 +11,11 @@ public class Vehicle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
-    private  String name;
+    private String name;
 
     private String model;
 
-    private String  photoUrl;
+    private String photoUrl;
 
     private String type;
 
@@ -25,8 +25,6 @@ public class Vehicle {
     private String status;
 
     @ManyToOne
-    @JoinColumn(name = "owner_id" , referencedColumnName = "id")
-    private User owner_id;
-
-
+    @JoinColumn(name = "owner_id", referencedColumnName = "id")
+    private User owner;
 }
