@@ -6,6 +6,7 @@ import com.renting.RentThis.entity.User;
 import com.renting.RentThis.entity.Vehicle;
 import com.renting.RentThis.repository.UserRepository;
 import com.renting.RentThis.repository.VehicleRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,7 +52,7 @@ public class VehicleService {
         User owner = userRepository.findByEmail(currentUserEmail)
                 .orElseThrow(()-> new RuntimeException("User not found with email "+ currentUserEmail));
 
-        vehicle.setOwner_id(owner);
+        vehicle.setOwner(owner);
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
 
         return VehicleResponse.builder()
@@ -59,7 +62,7 @@ public class VehicleService {
                 .type(savedVehicle.getType())
                 .plateNum(savedVehicle.getPlate_num())
                 .photoUrl(savedVehicle.getPhotoUrl())
-                .ownerName(savedVehicle.getOwner_id().getName())
+                .ownerName(savedVehicle.getOwner().getName())
                 .build();
 
 
@@ -76,7 +79,7 @@ public class VehicleService {
                         .type(vehicle.getType())
                         .plateNum(vehicle.getPlate_num())
                         .photoUrl(vehicle.getPhotoUrl())
-                        .ownerName(vehicle.getOwner_id().getName())
+                        .ownerName(vehicle.getOwner().getName())
                         .build())
                 .collect(Collectors.toList());
 
@@ -85,4 +88,65 @@ public class VehicleService {
 
     }
 
+    public VehicleResponse getOneVehicle(Long id) {
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Vehicle not found with id: " + id));
+
+        return VehicleResponse.builder()
+                .id(vehicle.getId())
+                .name(vehicle.getName())
+                .model(vehicle.getModel())
+                .type(vehicle.getType())
+                .plateNum(vehicle.getPlate_num())
+                .photoUrl(vehicle.getPhotoUrl())
+                .ownerName(vehicle.getOwner().getName())
+                .build();
+    }
+
+
+
+    public List<VehicleResponse> getUserVehicles(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        List<Vehicle> vehicles = vehicleRepository.findByOwnerId(user.getId());
+
+        List<VehicleResponse> responseList = vehicles.stream()
+                .map(vehicle -> VehicleResponse.builder()
+                        .id(vehicle.getId())
+                        .name(vehicle.getName())
+                        .model(vehicle.getModel())
+                        .type(vehicle.getType())
+                        .plateNum(vehicle.getPlate_num())
+                        .photoUrl(vehicle.getPhotoUrl())
+                        .ownerName(vehicle.getOwner().getName())
+                        .build())
+                .collect(Collectors.toList());
+
+        return responseList;
+    }
+
+    public List<VehicleResponse> loggedInUserVehicles(){
+
+        String currentUserEmail = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        User currentUser = userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(()-> new RuntimeException("User not found with email "+ currentUserEmail));
+
+        List<Vehicle> vehicles = vehicleRepository.findByOwnerId(currentUser.getId());
+
+        List<VehicleResponse> responseList = vehicles.stream()
+                .map(vehicle -> VehicleResponse.builder()
+                        .id(vehicle.getId())
+                        .name(vehicle.getName())
+                        .model(vehicle.getModel())
+                        .type(vehicle.getType())
+                        .plateNum(vehicle.getPlate_num())
+                        .photoUrl(vehicle.getPhotoUrl())
+                        .ownerName(vehicle.getOwner().getName())
+                        .build())
+                .collect(Collectors.toList());
+
+        return responseList;
+
+    }
 }

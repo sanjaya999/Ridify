@@ -4,7 +4,9 @@ import com.renting.RentThis.dto.request.VehicleRequest;
 import com.renting.RentThis.dto.response.ApiResponse;
 import com.renting.RentThis.dto.response.UserResponse;
 import com.renting.RentThis.dto.response.VehicleResponse;
+import com.renting.RentThis.entity.Vehicle;
 import com.renting.RentThis.service.VehicleService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +43,49 @@ public class VehicleController {
                 .build()
         );
     }
+
+
+    @GetMapping("/getOne")
+    public ResponseEntity<ApiResponse<VehicleResponse>> getOneVehicle(
+            @ModelAttribute VehicleRequest request,
+            @RequestParam("id") Long id) {
+
+        VehicleResponse vehicle = vehicleService.getOneVehicle(id);  // Return single object, not a list
+
+        return ResponseEntity.ok(ApiResponse.<VehicleResponse>builder()
+                .success(true)
+                .status(200)
+                .data(vehicle)
+                .message("Fetch successful")
+                .build());
+    }
+
+    @GetMapping("/userVehicle")
+    public ResponseEntity<ApiResponse<List<VehicleResponse>>> getUserVehicle(@ModelAttribute VehicleRequest request, @RequestParam("id") Long id){
+        List<VehicleResponse> vehicles = vehicleService.getUserVehicles(id);
+        return ResponseEntity.ok(ApiResponse.<List<VehicleResponse>>builder()
+                .success(true)
+                .status(200)
+                .data(vehicles)
+                .message("these are the users vehicles")
+                .build());
+    }
+
+    @GetMapping("/currentUserVehicles")
+    @PreAuthorize("isAuthenticated")
+    public ResponseEntity<ApiResponse<List<VehicleResponse>>> loggedInUserVehicles(@ModelAttribute VehicleRequest request ){
+        List<VehicleResponse> vehicleResponses = vehicleService.loggedInUserVehicles();
+
+        return ResponseEntity.ok(ApiResponse.<List<VehicleResponse>>builder()
+                .success(true)
+                .status(200)
+                .data(vehicleResponses)
+                .message("these are the users vehicles")
+                .build());
+
+
+    }
+
 
 
 }
