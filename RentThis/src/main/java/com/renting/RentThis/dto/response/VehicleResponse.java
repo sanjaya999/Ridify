@@ -13,6 +13,7 @@ public class VehicleResponse {
     private String type;
     private String plateNum;
     private String string;
+    private Integer price;
     private String photoUrl;
     private String ownerName;
 

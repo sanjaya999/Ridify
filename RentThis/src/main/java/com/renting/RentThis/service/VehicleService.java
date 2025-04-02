@@ -39,6 +39,7 @@ public class VehicleService {
         vehicle.setModel(request.getModel());
         vehicle.setPlate_num(request.getPlateNum());
         vehicle.setType(request.getType());
+        vehicle.setPrice(request.getPrice());
         vehicle.setStatus(request.getStatus());
 
 
@@ -61,6 +62,7 @@ public class VehicleService {
                 .model(savedVehicle.getModel())
                 .type(savedVehicle.getType())
                 .plateNum(savedVehicle.getPlate_num())
+                .price(savedVehicle.getPrice())
                 .photoUrl(savedVehicle.getPhotoUrl())
                 .ownerName(savedVehicle.getOwner().getName())
                 .build();
@@ -79,6 +81,7 @@ public class VehicleService {
                         .type(vehicle.getType())
                         .plateNum(vehicle.getPlate_num())
                         .photoUrl(vehicle.getPhotoUrl())
+                        .price(vehicle.getPrice())
                         .ownerName(vehicle.getOwner().getName())
                         .build())
                 .collect(Collectors.toList());
@@ -97,6 +100,7 @@ public class VehicleService {
                 .name(vehicle.getName())
                 .model(vehicle.getModel())
                 .type(vehicle.getType())
+                .price(vehicle.getPrice())
                 .plateNum(vehicle.getPlate_num())
                 .photoUrl(vehicle.getPhotoUrl())
                 .ownerName(vehicle.getOwner().getName())
@@ -118,6 +122,7 @@ public class VehicleService {
                         .model(vehicle.getModel())
                         .type(vehicle.getType())
                         .plateNum(vehicle.getPlate_num())
+                        .price(vehicle.getPrice())
                         .photoUrl(vehicle.getPhotoUrl())
                         .ownerName(vehicle.getOwner().getName())
                         .build())
@@ -140,6 +145,7 @@ public class VehicleService {
                         .name(vehicle.getName())
                         .model(vehicle.getModel())
                         .type(vehicle.getType())
+                        .price(vehicle.getPrice())
                         .plateNum(vehicle.getPlate_num())
                         .photoUrl(vehicle.getPhotoUrl())
                         .ownerName(vehicle.getOwner().getName())

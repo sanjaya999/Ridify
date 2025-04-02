@@ -21,6 +21,7 @@ public class Vehicle {
 
     private String plate_num;
 
+    private  Integer price;
 
     private String status;
 

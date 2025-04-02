@@ -22,6 +22,9 @@ public class VehicleRequest {
     @NotBlank(message = "Status should be updated")
     private String status;
 
+    @NotBlank(message = "price cannot be blank")
+    private Integer price;
+
     private MultipartFile photo;
 
 
