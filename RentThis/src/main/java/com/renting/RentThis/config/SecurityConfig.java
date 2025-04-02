@@ -22,7 +22,6 @@ public class SecurityConfig {
     private  final JwtAuthenticationFilter jwtAuthFilter;
 
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
