@@ -1,5 +1,6 @@
 package com.renting.RentThis.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,6 +17,8 @@ public class User {
 
     @Column(name = "email" , nullable = false , unique = true )
     private String email;
+
+    @JsonIgnore
     private String password;
 
     private  String role;
