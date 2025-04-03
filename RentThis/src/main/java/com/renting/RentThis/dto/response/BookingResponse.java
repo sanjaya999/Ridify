@@ -15,8 +15,8 @@ public class BookingResponse {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
 
-    private Vehicle vehicle;
-    private User bookedUser;
+    private VehicleResponse vehicle;
+    private UserResponse bookedUser;
     private String status;
 
 
