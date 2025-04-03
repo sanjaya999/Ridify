@@ -8,6 +8,7 @@ import com.renting.RentThis.entity.Vehicle;
 import com.renting.RentThis.repository.BookingRespository;
 import com.renting.RentThis.repository.UserRepository;
 import com.renting.RentThis.repository.VehicleRepository;
+import com.renting.RentThis.util.ResponseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -96,8 +97,8 @@ public class BookingService {
                 .id(booking.getId())
                 .startDate(booking.getStartTime())
                 .endDate(booking.getEndTime())
-                .vehicle(booking.getVehicle())
-                .bookedUser(booking.getUser())
+                .vehicle(ResponseMapper.toVehicleMap(saveBooking.getVehicle()))
+                .bookedUser(ResponseMapper.toUserMap(saveBooking.getUser()))
                 .status(booking.getStatus())
                 .build();
 
