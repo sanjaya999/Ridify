@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+
 @Data
 public class VehicleRequest {
 
@@ -23,7 +25,7 @@ public class VehicleRequest {
     private String status;
 
     @NotBlank(message = "price cannot be blank")
-    private Integer price;
+    private BigDecimal price;
 
     private MultipartFile photo;
 

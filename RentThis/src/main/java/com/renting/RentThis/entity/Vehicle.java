@@ -3,6 +3,8 @@ package com.renting.RentThis.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "vehicle")
 @Data
@@ -21,7 +23,7 @@ public class Vehicle {
 
     private String plate_num;
 
-    private  Integer price;
+    private BigDecimal price;
 
     private String status;
 

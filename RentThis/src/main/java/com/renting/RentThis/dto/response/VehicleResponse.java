@@ -3,6 +3,8 @@ package com.renting.RentThis.dto.response;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 public class VehicleResponse {
@@ -13,7 +15,7 @@ public class VehicleResponse {
     private String type;
     private String plateNum;
     private String string;
-    private Integer price;
+    private BigDecimal price;
     private String photoUrl;
     private UserResponse ownerName;
 
