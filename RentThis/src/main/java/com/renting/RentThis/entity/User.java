@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "users")
 @Data
@@ -27,6 +29,8 @@ public class User {
     public String toString() {
         return "User(id=" + id + ", name=" + name + ", email=" + email + ", role=" + role + ")";
     }
+
+    private BigDecimal balance;
 
 
 
