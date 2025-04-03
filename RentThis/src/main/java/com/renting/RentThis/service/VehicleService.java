@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.text.html.Option;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,8 +41,7 @@ public class VehicleService {
         vehicle.setModel(request.getModel());
         vehicle.setPlate_num(request.getPlateNum());
         vehicle.setType(request.getType());
-        vehicle.setPrice(request.getPrice());
-        vehicle.setStatus(request.getStatus());
+        vehicle.setPrice(request.getPrice());        vehicle.setStatus(request.getStatus());
 
 
             String photoUrl = fileStorageService.saveFile(photo);
