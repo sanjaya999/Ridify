@@ -3,6 +3,8 @@ package com.renting.RentThis.dto.response;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 public class LoginResponse {
@@ -12,5 +14,7 @@ public class LoginResponse {
     private String accessToken;
     private String refreshToken;
     private String role;
+    private BigDecimal balance;
+
 
 }

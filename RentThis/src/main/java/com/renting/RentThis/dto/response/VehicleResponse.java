@@ -15,7 +15,7 @@ public class VehicleResponse {
     private String string;
     private Integer price;
     private String photoUrl;
-    private String ownerName;
+    private UserResponse ownerName;
 
 
 }
