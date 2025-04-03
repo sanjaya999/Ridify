@@ -73,6 +73,7 @@ public class UserService {
                 .role(user.getRole())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .balance(user.getBalance())
                 .build();
     }
 
