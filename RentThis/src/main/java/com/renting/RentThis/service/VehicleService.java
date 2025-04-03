@@ -6,6 +6,7 @@ import com.renting.RentThis.entity.User;
 import com.renting.RentThis.entity.Vehicle;
 import com.renting.RentThis.repository.UserRepository;
 import com.renting.RentThis.repository.VehicleRepository;
+import com.renting.RentThis.util.ResponseMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -64,7 +65,7 @@ public class VehicleService {
                 .plateNum(savedVehicle.getPlate_num())
                 .price(savedVehicle.getPrice())
                 .photoUrl(savedVehicle.getPhotoUrl())
-                .ownerName(savedVehicle.getOwner().getName())
+                .ownerName(ResponseMapper.toUserMap(savedVehicle.getOwner()))
                 .build();
 
 
@@ -82,7 +83,7 @@ public class VehicleService {
                         .plateNum(vehicle.getPlate_num())
                         .photoUrl(vehicle.getPhotoUrl())
                         .price(vehicle.getPrice())
-                        .ownerName(vehicle.getOwner().getName())
+                        .ownerName(ResponseMapper.toUserMap(vehicle.getOwner()))
                         .build())
                 .collect(Collectors.toList());
 
@@ -103,7 +104,7 @@ public class VehicleService {
                 .price(vehicle.getPrice())
                 .plateNum(vehicle.getPlate_num())
                 .photoUrl(vehicle.getPhotoUrl())
-                .ownerName(vehicle.getOwner().getName())
+                .ownerName(ResponseMapper.toUserMap(vehicle.getOwner()))
                 .build();
     }
 
@@ -124,7 +125,7 @@ public class VehicleService {
                         .plateNum(vehicle.getPlate_num())
                         .price(vehicle.getPrice())
                         .photoUrl(vehicle.getPhotoUrl())
-                        .ownerName(vehicle.getOwner().getName())
+                        .ownerName(ResponseMapper.toUserMap(vehicle.getOwner()))
                         .build())
                 .collect(Collectors.toList());
 
@@ -148,7 +149,7 @@ public class VehicleService {
                         .price(vehicle.getPrice())
                         .plateNum(vehicle.getPlate_num())
                         .photoUrl(vehicle.getPhotoUrl())
-                        .ownerName(vehicle.getOwner().getName())
+                        .ownerName(ResponseMapper.toUserMap(vehicle.getOwner()))
                         .build())
                 .collect(Collectors.toList());
 
