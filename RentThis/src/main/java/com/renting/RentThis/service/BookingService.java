@@ -5,6 +5,7 @@ import com.renting.RentThis.dto.response.BookingResponse;
 import com.renting.RentThis.entity.Booking;
 import com.renting.RentThis.entity.User;
 import com.renting.RentThis.entity.Vehicle;
+import com.renting.RentThis.exception.InsufficientBalanceException;
 import com.renting.RentThis.repository.BookingRespository;
 import com.renting.RentThis.repository.UserRepository;
 import com.renting.RentThis.repository.VehicleRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.awt.print.Book;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,6 +43,8 @@ public class BookingService {
     @Autowired
     private IntervalSchedulingService intervalSchedulingService;
 
+    @Autowired
+    private PaymentService paymentService;
     public BookingResponse addBooking(BookingRequest request ){
 
         if (request.getStartTime().isAfter(request.getEndTime())) {
@@ -80,27 +84,42 @@ public class BookingService {
                     "Requested time unavailable. Nearby availability: " + availableTimes
             );
         }
-        Booking booking = new Booking();
+
         String currentUserEmail = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
         User currentUser = userRepository.findByEmail(currentUserEmail)
                 .orElseThrow(()-> new RuntimeException("User not found with email "+ currentUserEmail));
+        BigDecimal balance = currentUser.getBalance();
+        BigDecimal vehiclePrice = vehicle.getPrice();
+        User vehicleOwner = vehicle.getOwner();
 
-        booking.setUser(currentUser);
-        booking.setVehicle(vehicle);
-        booking.setStartTime(request.getStartTime());
-        booking.setEndTime(request.getEndTime());
-        booking.setStatus("Confirmed");
+        try{
+            paymentService.processInternalPayment(currentUser , vehicleOwner
+            ,vehiclePrice , "Booking" + LocalDateTime.now());
+            Booking booking = new Booking();
+            booking.setUser(currentUser);
+            booking.setVehicle(vehicle);
+            booking.setStartTime(request.getStartTime());
+            booking.setEndTime(request.getEndTime());
+            booking.setStatus("Confirmed");
 
-        Booking saveBooking = bookingRespository.save(booking);
+            Booking saveBooking = bookingRespository.save(booking);
+            return BookingResponse.builder()
+                    .id(booking.getId())
+                    .startDate(booking.getStartTime())
+                    .endDate(booking.getEndTime())
+                    .vehicle(ResponseMapper.toVehicleMap(saveBooking.getVehicle()))
+                    .bookedUser(ResponseMapper.toUserMap(saveBooking.getUser()))
+                    .status(booking.getStatus())
+                    .build();
+        }catch (InsufficientBalanceException e){
+            throw  new ResponseStatusException(HttpStatus.BAD_REQUEST , e.getMessage());
+        }
 
-        return BookingResponse.builder()
-                .id(booking.getId())
-                .startDate(booking.getStartTime())
-                .endDate(booking.getEndTime())
-                .vehicle(ResponseMapper.toVehicleMap(saveBooking.getVehicle()))
-                .bookedUser(ResponseMapper.toUserMap(saveBooking.getUser()))
-                .status(booking.getStatus())
-                .build();
+
+
+
+
+
 
     }
 
