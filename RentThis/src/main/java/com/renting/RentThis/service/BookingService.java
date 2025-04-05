@@ -12,6 +12,7 @@ import com.renting.RentThis.repository.VehicleRepository;
 import com.renting.RentThis.util.ResponseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -116,13 +117,46 @@ public class BookingService {
         }
 
 
+    }
 
 
+    public List<BookingResponse> getCurrentUserBooking(){
+        String currentUserEmail = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        User currentUser = userRepository.findByEmail(currentUserEmail).orElseThrow(()-> new RuntimeException("user not found"));
 
+        List<Booking> bookings = bookingRespository.findByUserId(currentUser.getId());
 
+        return bookings.stream()
+                .map(booking -> BookingResponse.builder()
+                        .id(booking.getId())
+                        .startDate(booking.getStartTime())
+                        .endDate(booking.getEndTime())
+                        .vehicle(ResponseMapper.toVehicleMap(booking.getVehicle()))
+                        .bookedUser(ResponseMapper.toUserMap(booking.getUser()))
+                        .status(booking.getStatus())
+                        .build())
+                .collect(Collectors.toList());
 
     }
 
+    @PreAuthorize("@userSecurity.isVehicleOwner(#vehicleId)")
+    public List<BookingResponse> allBookingOfOneVehicle(Long vehicleId){
+
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND , "vehicle not found"));
+
+        List<Booking> bookings = bookingRespository.findByVehicleId(vehicleId);
+
+        return bookings.stream()
+                .map(booking -> BookingResponse.builder()
+                        .id(booking.getId())
+                        .startDate(booking.getStartTime())
+                        .endDate(booking.getEndTime())
+                        .bookedUser(ResponseMapper.toUserMap(booking.getUser()))
+                        .status(booking.getStatus())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
 
 }
