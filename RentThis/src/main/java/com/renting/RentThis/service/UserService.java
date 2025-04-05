@@ -8,6 +8,8 @@ import com.renting.RentThis.entity.User;
 import com.renting.RentThis.repository.TokenRepository;
 import com.renting.RentThis.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -77,4 +79,9 @@ public class UserService {
                 .build();
     }
 
+    public User getCurrentUser() {
+        String currentUserEmail = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        return userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new RuntimeException("User not found with email " + currentUserEmail));
+    }
 }
