@@ -3,11 +3,14 @@ package com.renting.RentThis.controller;
 import com.renting.RentThis.dto.request.BookingRequest;
 import com.renting.RentThis.dto.response.ApiResponse;
 import com.renting.RentThis.dto.response.BookingResponse;
+import com.renting.RentThis.dto.response.VehicleResponse;
 import com.renting.RentThis.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/book")
@@ -28,5 +31,29 @@ public class BookingController {
                 .build());
     }
 
+    @GetMapping("/currentUserBooking")
+    public ResponseEntity<ApiResponse<List<BookingResponse>>> currentUserBookings(){
+       List<BookingResponse> bookingResponse = bookingService.getCurrentUserBooking();
 
+       return ResponseEntity.ok(ApiResponse.<List<BookingResponse>>builder()
+               .success(true)
+               .status(200)
+               .data(bookingResponse)
+               .message("success")
+               .build());
+
+    }
+
+    @GetMapping("/{vehicleId}/bookings")
+    public ResponseEntity<ApiResponse<List<BookingResponse>>> allBookingOfOneVehicle(@PathVariable  Long vehicleId){
+
+        List<BookingResponse> bookingResponse = bookingService.allBookingOfOneVehicle(vehicleId);
+
+        return ResponseEntity.ok(ApiResponse.<List<BookingResponse>>builder()
+                .success(true)
+                .status(200)
+                .data(bookingResponse)
+                .message("success")
+                .build());
+    }
 }
