@@ -10,7 +10,7 @@
   align-items: center;
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(120deg, #2980b9, #8e44ad);
+  background-color: #f9f9f9;
   padding: 20px;
   position: fixed;
   top: 0;
@@ -20,14 +20,13 @@
 }
 
 .login-box {
-  background: rgba(255, 255, 255, 0.97);
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   padding: 40px;
   width: 100%;
   max-width: 450px;
   position: relative;
-  backdrop-filter: blur(10px);
   margin: auto;
 }
 
@@ -37,19 +36,16 @@
 }
 
 .login-header h2 {
-  color: #2c3e50;
-  font-size: 2.5rem;
-  font-weight: 600;
+  color: #333;
+  font-size: 2rem;
+  font-weight: 500;
   margin-bottom: 10px;
-  background: linear-gradient(45deg, #2980b9, #8e44ad);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.5px;
 }
 
 .login-header p {
-  color: #7f8c8d;
-  font-size: 1.1rem;
+  color: #777;
+  font-size: 1rem;
 }
 
 .login-form {
@@ -65,84 +61,80 @@
 
 /* Material UI TextField customization */
 .form-group .MuiOutlinedInput-root {
-  border-radius: 12px;
+  border-radius: 4px;
   transition: all 0.3s ease;
 }
 
 .form-group .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: #2980b9;
+  border-color: #555;
 }
 
 .form-group .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: #8e44ad;
-  border-width: 2px;
+  border-color: #333;
+  border-width: 1px;
 }
 
 .form-group .MuiInputLabel-root.Mui-focused {
-  color: #8e44ad;
+  color: #333;
 }
 
 .form-group input {
-  font-size: 1.1rem;
+  font-size: 1rem;
   padding: 15px;
 }
 
 .error-message {
-  color: #e74c3c;
+  color: #d32f2f;
   font-size: 0.9rem;
   margin-top: 5px;
 }
 
 .login-button {
-  background: linear-gradient(45deg, #2980b9, #8e44ad);
+  background-color: #333;
   color: white;
-  padding: 15px;
+  padding: 12px;
   border: none;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .login-button:hover {
-  background: linear-gradient(45deg, #3498db, #9b59b6);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  background-color: #555;
 }
 
 .login-button:active {
-  transform: translateY(0);
+  transform: translateY(1px);
 }
 
 .login-button:disabled {
-  background: #bdc3c7;
+  background: #ccc;
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
 }
 
 .register-link {
   text-align: center;
   margin-top: 25px;
-  color: #7f8c8d;
-  font-size: 1.1rem;
+  color: #777;
+  font-size: 1rem;
 }
 
 .register-link a {
-  color: #2980b9;
+  color: #333;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
   margin-left: 5px;
   transition: all 0.3s ease;
 }
 
 .register-link a:hover {
-  color: #8e44ad;
-  text-decoration: none;
+  color: #555;
+  text-decoration: underline;
 }
 
 .loading {
@@ -155,43 +147,19 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 20px;
+  border-radius: 8px;
   backdrop-filter: blur(5px);
 }
 
 /* Alert customization */
 .MuiAlert-root {
-  border-radius: 12px !important;
+  border-radius: 4px !important;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
   .login-box {
     padding: 30px;
-  }
-  
-  .login-header h2 {
-    font-size: 2rem;
-  }
-  
-  .login-header p {
-    font-size: 1rem;
-  }
-  
-  .form-group input {
-    font-size: 1rem;
-    padding: 12px;
-  }
-  
-  .login-button {
-    padding: 12px;
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .login-box {
-    padding: 25px;
   }
   
   .login-header h2 {
@@ -202,25 +170,51 @@
     font-size: 0.9rem;
   }
   
-  .register-link {
-    font-size: 1rem;
+  .form-group input {
+    font-size: 0.9rem;
+    padding: 12px;
+  }
+  
+  .login-button {
+    padding: 10px;
+    font-size: 0.9rem;
   }
 }
 
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
+@media (max-width: 480px) {
   .login-box {
-    background: rgba(33, 33, 33, 0.97);
+    padding: 25px;
   }
   
   .login-header h2 {
-    background: linear-gradient(45deg, #3498db, #9b59b6);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 1.6rem;
   }
   
   .login-header p {
-    color: #95a5a6;
+    font-size: 0.85rem;
+  }
+  
+  .register-link {
+    font-size: 0.9rem;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .login-container {
+    background-color: #121212;
+  }
+  
+  .login-box {
+    background: #1a1a1a;
+  }
+  
+  .login-header h2 {
+    color: #f0f0f0;
+  }
+  
+  .login-header p {
+    color: #ccc;
   }
   
   .form-group .MuiOutlinedInput-root {
@@ -228,22 +222,43 @@
   }
   
   .form-group .MuiInputLabel-root {
-    color: #95a5a6;
+    color: #ccc;
+  }
+  
+  .form-group .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #ccc;
+  }
+  
+  .form-group .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #f0f0f0;
+  }
+  
+  .form-group .MuiInputLabel-root.Mui-focused {
+    color: #f0f0f0;
+  }
+  
+  .login-button {
+    background-color: #f0f0f0;
+    color: #121212;
+  }
+  
+  .login-button:hover {
+    background-color: #ccc;
   }
   
   .register-link {
-    color: #95a5a6;
+    color: #ccc;
   }
   
   .register-link a {
-    color: #3498db;
+    color: #f0f0f0;
   }
   
   .register-link a:hover {
-    color: #9b59b6;
+    color: #fff;
   }
   
   .loading {
-    background: rgba(33, 33, 33, 0.9);
+    background: rgba(26, 26, 26, 0.9);
   }
 }
