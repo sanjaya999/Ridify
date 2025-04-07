@@ -65,10 +65,12 @@ public class PaymentService {
             BigDecimal amount,
             String orderId,
             String productName,
+            Long currentUserId ,
             String customerName,
             String customerEmail,
             String customerPhone,
-            String returnUrl
+            String returnUrl,
+            Long vehicleOwnerId
     ){
         log.info("Initiating khalti Payment for order:{} , amount: {}" , orderId , amount);
 
@@ -101,6 +103,8 @@ public class PaymentService {
             );
 
             log.info("Khalti payment initiated successfully with pidx: {}", response.get("pidx"));
+
+
             return response;
 
 
@@ -147,39 +151,7 @@ public class PaymentService {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    private void createTransactionRecord(Long payerId, Long receiverId, BigDecimal amount,
+    public void createTransactionRecord(Long payerId, Long receiverId, BigDecimal amount,
                                          String reference, String paymentMethod) {
         Transaction transaction = new Transaction();
         transaction.setPayerId(payerId);
