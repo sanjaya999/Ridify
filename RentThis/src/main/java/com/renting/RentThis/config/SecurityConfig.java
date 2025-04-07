@@ -30,8 +30,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/v1/users/**").permitAll()
                             .requestMatchers("/vehicles/**").permitAll()
                             .requestMatchers("/uploads/**").permitAll()
-                            .requestMatchers("/vehicles/admin/**").hasRole("admin")
-                            .anyRequest().authenticated();
+                            .requestMatchers("/api/v1/payments/khaltiCall/callback").permitAll()                            .anyRequest().authenticated();
                 })
                 .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter , UsernamePasswordAuthenticationFilter.class)
