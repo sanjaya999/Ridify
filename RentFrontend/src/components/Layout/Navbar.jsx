@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { AppBar, Toolbar, IconButton, Button, Drawer, List, ListItem, ListItemText, useMediaQuery, useTheme } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import './Layout.css';
+import '../../assets/styles/Layout.css';
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -36,12 +36,6 @@ const Navbar = () => {
           component={NavLink}
           to={item.path}
           className="nav-link"
-          sx={{
-            color: 'white',
-            '&.active': {
-              color: '#ffd700',
-            }
-          }}
         >
           {item.text}
         </Button>
@@ -50,7 +44,7 @@ const Navbar = () => {
   );
 
   const drawer = (
-    <List>
+    <List className="mobile-drawer-list">
       {menuItems.map((item) => (
         <ListItem
           button
@@ -68,19 +62,12 @@ const Navbar = () => {
 
   const authButtons = isAuthenticated ? (
     <Button
-      variant="contained"
+      variant="outlined"
       className="auth-button"
       onClick={() => {
         localStorage.removeItem('accessToken');
         setIsAuthenticated(false);
         navigate('/login');
-      }}
-      sx={{ 
-        bgcolor: '#ffd700',
-        color: '#000',
-        '&:hover': {
-          bgcolor: '#ffc800'
-        }
       }}
     >
       Logout
@@ -92,22 +79,14 @@ const Navbar = () => {
         to="/login"
         variant="text"
         className="auth-button"
-        sx={{ color: 'white' }}
       >
         Login
       </Button>
       <Button
         component={NavLink}
         to="/register"
-        variant="contained"
-        className="auth-button"
-        sx={{ 
-          bgcolor: '#ffd700',
-          color: '#000',
-          '&:hover': {
-            bgcolor: '#ffc800'
-          }
-        }}
+        variant="outlined"
+        className="auth-button-register"
       >
         Register
       </Button>
@@ -116,7 +95,7 @@ const Navbar = () => {
 
   return (
     <>
-      <AppBar position="fixed" className="navbar">
+      <AppBar position="fixed" className="navbar-minimal" elevation={0}>
         <Toolbar>
           {isMobile && (
             <IconButton
@@ -130,13 +109,13 @@ const Navbar = () => {
             </IconButton>
           )}
           
-          <div className="logo" onClick={() => navigate('/')}>
+          <div className="logo-minimal" onClick={() => navigate('/')}>
             <DirectionsCarIcon sx={{ mr: 1 }} />
             <span>Ridify</span>
           </div>
 
           {!isMobile && (
-            <div className="nav-links">
+            <div className="nav-links-minimal">
               {navLinks}
             </div>
           )}

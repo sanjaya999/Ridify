@@ -1,72 +1,56 @@
 import React from 'react';
-import { Container, Grid, Typography, IconButton, Link } from '@mui/material';
+import { Container, Grid, Typography, Link, IconButton } from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import './Layout.css';
 
 const Footer = () => {
   return (
     <footer className="footer">
-      <Container maxWidth="lg">
-        <Grid container spacing={4}>
-          <Grid item xs={12} sm={4}>
+      <div className="footer-container">
+        <Grid container spacing={3}>
+          <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6" className="footer-title">
               About Ridify
             </Typography>
             <Typography variant="body2" className="footer-text">
-              Your trusted platform for vehicle rentals. We provide quality vehicles
-              and exceptional service to make your journey comfortable and memorable.
+              Your trusted platform for quality vehicle rentals in Nepal.
             </Typography>
           </Grid>
           
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} sm={6} md={4}>
             <Typography variant="h6" className="footer-title">
               Quick Links
             </Typography>
             <ul className="footer-links">
-              <li><Link href="/vehicles">Available Vehicles</Link></li>
-              <li><Link href="/about">About Us</Link></li>
-              <li><Link href="/contact">Contact Us</Link></li>
-              <li><Link href="/terms">Terms & Conditions</Link></li>
+              <li><Link href="/vehicles">Vehicles</Link></li>
+              <li><Link href="/about">About</Link></li>
+              <li><Link href="/contact">Contact</Link></li>
             </ul>
           </Grid>
           
-          <Grid item xs={12} sm={4}>
+          <Grid item xs={12} md={4}>
             <Typography variant="h6" className="footer-title">
-              Contact Info
+              Contact
             </Typography>
             <Typography variant="body2" className="footer-text">
-              123 Rental Street<br />
               Kathmandu, Nepal<br />
-              Phone: +977 1234567890<br />
-              Email: info@ridify.com
+              info@ridify.com
             </Typography>
           </Grid>
         </Grid>
         
         <div className="footer-bottom">
           <div className="social-links">
-            <IconButton color="inherit" aria-label="Facebook">
-              <FacebookIcon />
-            </IconButton>
-            <IconButton color="inherit" aria-label="Twitter">
-              <TwitterIcon />
-            </IconButton>
-            <IconButton color="inherit" aria-label="Instagram">
-              <InstagramIcon />
-            </IconButton>
-            <IconButton color="inherit" aria-label="LinkedIn">
-              <LinkedInIcon />
-            </IconButton>
+            <IconButton><FacebookIcon fontSize="small" /></IconButton>
+            <IconButton><TwitterIcon fontSize="small" /></IconButton>
+            <IconButton><InstagramIcon fontSize="small" /></IconButton>
           </div>
-          
           <Typography variant="body2" className="copyright">
-            © {new Date().getFullYear()} Ridify. All rights reserved.
+            &copy; {new Date().getFullYear()} Ridify
           </Typography>
         </div>
-      </Container>
+      </div>
     </footer>
   );
 };
