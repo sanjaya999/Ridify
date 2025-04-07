@@ -80,7 +80,7 @@ public class KhaltiController {
         response.put("purchase_order_id", purchaseOrderId);
         response.put("purchase_order_name", purchaseOrderName);
 
-        if ("User canceled".equalsIgnoreCase(status)) {
+        if ("User canceled".equalsIgnoreCase(status) ||"Unhandled status.".equalsIgnoreCase(status) ) {
             response.put("message", "Payment canceled by user.");
             return ResponseEntity.ok(response);
         }
