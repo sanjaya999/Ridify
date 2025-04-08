@@ -1,7 +1,7 @@
 import axios from "axios"
 //base axios instance created with base url and headers (default)
 const apiClient = axios.create({
-    baseURL: "http://localhost:8080/",
+    baseURL: "http://localhost:8080",
     headers : {
         'Content-Type': 'application/json',
     }
@@ -21,65 +21,25 @@ const processQueue = (error, token = null) => {
     
     failedQueue = [];
   };
+
 //interceptor will add authorization headers to every request
 apiClient.interceptors.request.use(
-    config =>{
-        const token = localStorage.getItem('authToken');
-        if(token){
-            config.headers['Authorization'] = `Bearer ${token}`;
-        }
-        return config;
-    },
-    error =>{
-        return Promise.reject(error)
+  config => {
+    const token = localStorage.getItem('accessToken');
+    console.log('[Interceptor] Current token:', token); // Debug log
+    console.log('[Interceptor] Original headers:', config.headers); // Debug log
+    
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log('[Interceptor] Modified headers:', config.headers); // Debug log
     }
-)
-
-
-apiClient.interceptors.request.use(
-    response => response,
-    async error =>{
-        const originalRequest = error.config;
-        if(error.response.status === 401 && !originalRequest._retry ){
-            if(!isRefreshing){
-                return new Promise((resolve , reject)=>{
-                    failedQueue.push({resolve , reject});
-                }).then(token =>{
-                    originalRequest.headers['Authorization'] = 'Bearer '+ token;
-                     return apiClient(originalRequest);
-                }).catch(err=> Promise.reject(err)  )
-            }
-
-            originalRequest._retry = true;
-            isRefreshing = true;
-
-            try {
-                const refreshToken = localStorage.getItem('refreshToken');
-                const response = await apiClient.post('/auth/refresh-token', { refreshToken });
-                const { token } = response.data;
-                
-                localStorage.setItem('authToken', token);
-                apiClient.defaults.headers.common['Authorization'] = 'Bearer ' + token;
-                processQueue(null, token);
-                return apiClient(originalRequest);
-            
-            } catch (refreshError) {
-                processQueue(refreshError, null);
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('refreshToken');
-
-                window.location.href = '/login';
-                return Promise.reject(refreshError);
-                
-            }finally {
-                isRefreshing = false;
-              }
-        }    return Promise.reject(error);
-
-    }
-)
-
-
+    return config;
+  },
+  error => {
+    console.error('[Interceptor] Error:', error);
+    return Promise.reject(error);
+  }
+);
 
   export const get = async (endpoint) => {
     try {
