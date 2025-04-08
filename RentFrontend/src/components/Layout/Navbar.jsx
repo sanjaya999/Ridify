@@ -1,24 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { AppBar, Toolbar, IconButton, Button, Drawer, List, ListItem, ListItemText, useMediaQuery, useTheme } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Button, Drawer, List, ListItem, ListItemText, useMediaQuery, useTheme, Menu, MenuItem } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import '../../assets/styles/Layout.css';
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
+    const storedUserId = localStorage.getItem('userId');
     setIsAuthenticated(!!token);
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
   }, []);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleProfileMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleViewBookings = () => {
+    navigate('/bookings');
+    handleProfileMenuClose();
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('userId');
+    setIsAuthenticated(false);
+    setUserId(null);
+    navigate('/login');
+    handleProfileMenuClose();
   };
 
   const menuItems = [
@@ -57,21 +86,66 @@ const Navbar = () => {
           <ListItemText primary={item.text} />
         </ListItem>
       ))}
+      {isAuthenticated && (
+        <>
+          <ListItem
+            button
+            component={NavLink}
+            to="/bookings"
+            onClick={handleDrawerToggle}
+            className="drawer-link"
+          >
+            <ListItemText primary="My Bookings" />
+          </ListItem>
+          <ListItem
+            button
+            onClick={() => {
+              localStorage.removeItem('accessToken');
+              localStorage.removeItem('userId');
+              setIsAuthenticated(false);
+              setUserId(null);
+              navigate('/login');
+              handleDrawerToggle();
+            }}
+            className="drawer-link"
+          >
+            <ListItemText primary="Logout" />
+          </ListItem>
+        </>
+      )}
     </List>
   );
 
   const authButtons = isAuthenticated ? (
-    <Button
-      variant="outlined"
-      className="auth-button"
-      onClick={() => {
-        localStorage.removeItem('accessToken');
-        setIsAuthenticated(false);
-        navigate('/login');
-      }}
-    >
-      Logout
-    </Button>
+    <div className="profile-section">
+      <IconButton
+        aria-label="account of current user"
+        aria-controls="menu-appbar"
+        aria-haspopup="true"
+        onClick={handleProfileMenuOpen}
+        color="inherit"
+      >
+        <AccountCircleIcon />
+      </IconButton>
+      <Menu
+        id="menu-appbar"
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        keepMounted
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+        open={Boolean(anchorEl)}
+        onClose={handleProfileMenuClose}
+      >
+        <MenuItem onClick={handleViewBookings}>My Bookings</MenuItem>
+        <MenuItem onClick={handleLogout}>Logout</MenuItem>
+      </Menu>
+    </div>
   ) : (
     <div className="auth-buttons">
       <Button
