@@ -5,6 +5,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import PrivateRoute from './components/ProtectedRoutes/PrivateRoute';
 import PublicRoute from './components/ProtectedRoutes/PublicRoute';
+import Bookings from './components/Bookings/Bookings';
 import './App.css';
 
 function App() {
@@ -24,7 +25,7 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="vehicles" element={<div>Vehicles Page</div>} />
             <Route path="profile" element={<div>Profile Page</div>} />
-            <Route path="bookings" element={<div>My Bookings</div>} />
+            <Route path="bookings" element={<Bookings />} />
           </Route>
         </Route>
 
