@@ -14,7 +14,7 @@ const Bookings = () => {
     return data;
   };
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['vehicles'],
+    queryKey: ['bookings'],
     queryFn: fetchVehicles,
     staleTime:60000,
     cacheTime:20000,
