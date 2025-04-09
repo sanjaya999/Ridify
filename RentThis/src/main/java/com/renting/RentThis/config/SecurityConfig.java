@@ -4,9 +4,6 @@ import com.renting.RentThis.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-// Remove if not explicitly needed for AuthenticationManager bean below
-// import org.springframework.security.authentication.AuthenticationManager;
-// import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -28,7 +25,7 @@ import java.util.List; // Import List
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
-    // If you were using CorsConfig for other beans, keep it, otherwise it might be removable
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -46,25 +43,23 @@ public class SecurityConfig {
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(form -> form.disable()) // Ensure form login is disabled if using JWT
-                // .httpBasic(basic -> basic.disable()) // Also disable http basic if not needed
+                .formLogin(form -> form.disable())
                 .build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // IMPORTANT: Allowed Origins - Use specific origins in production!
-        // For development (assuming React runs on port 3000):
+
+
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
-        // Or allow any origin (less secure, okay for initial testing):
-        // configuration.setAllowedOrigins(List.of("*"));
+
 
         // Allowed Methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 
         // Allowed Headers
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type" /* Add any other custom headers your frontend might send */));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type" ));
 
         // IMPORTANT: Allow Credentials - Necessary for sending cookies or Authorization headers
         configuration.setAllowCredentials(true);
