@@ -7,6 +7,7 @@ import PrivateRoute from './components/ProtectedRoutes/PrivateRoute';
 import PublicRoute from './components/ProtectedRoutes/PublicRoute';
 import Bookings from './components/Bookings/Bookings';
 import './App.css';
+import VehicleDetail from "./components/VehicleBooking/VehicleDetail.jsx";
 
 function App() {
   return (
@@ -21,6 +22,8 @@ function App() {
           <Route index element={<Home />} />
           <Route path="about" element={<div>About Page</div>} />
           <Route path="contact" element={<div>Contact Page</div>} />
+          <Route path="/aboutVehicle/:id" element={<VehicleDetail />} />
+
 
           <Route element={<PrivateRoute />}>
             <Route path="vehicles" element={<div>Vehicles Page</div>} />
