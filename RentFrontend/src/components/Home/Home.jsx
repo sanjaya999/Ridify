@@ -37,9 +37,7 @@ const Home = () => {
             <img 
               src={`http://localhost:8080/${vehicle.photoUrl}`} 
               alt={vehicle.name} 
-              onError={(e) => {
-                e.target.src = 'https://via.placeholder.com/300x200?text=Vehicle+Image';
-              }}
+              
             />
             <h3>{vehicle.name}</h3>
             <p>{vehicle.description}</p>
