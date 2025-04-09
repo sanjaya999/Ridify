@@ -26,12 +26,9 @@ const processQueue = (error, token = null) => {
 apiClient.interceptors.request.use(
   config => {
     const token = localStorage.getItem('accessToken');
-    console.log('[Interceptor] Current token:', token); // Debug log
-    console.log('[Interceptor] Original headers:', config.headers); // Debug log
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('[Interceptor] Modified headers:', config.headers); // Debug log
     }
     return config;
   },
@@ -41,9 +38,9 @@ apiClient.interceptors.request.use(
   }
 );
 
-  export const get = async (endpoint) => {
+  export const get = async (endpoint , config) => {
     try {
-      const response = await apiClient.get(endpoint);
+      const response = await apiClient.get(endpoint, config);
       return response.data;
     } catch (error) {
       console.error('GET request error:', error);
