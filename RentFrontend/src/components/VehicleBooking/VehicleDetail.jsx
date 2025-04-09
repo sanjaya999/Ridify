@@ -1,292 +1,307 @@
-import React, {useState} from 'react';
-import {useQuery} from "@tanstack/react-query";
-import {get} from "../../api/api.js";
-import {useParams} from "react-router-dom";
-import Datetime from 'react-datetime';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import '../../assets/styles/VehicleDetail.css';
 
+// API base URL
+const API_BASE_URL = 'http://localhost:8080';
 
- const VehicleDetail =  () => {
-     // Initialize with current date/time
-     const currentDateTime = new Date();
-     const [startDateTime, setStartDateTime] = useState(currentDateTime);
-     const [endDateTime, setEndDateTime] = useState(new Date(currentDateTime.getTime() + 60 * 60 * 1000)); // Default to 1 hour later
-     const [isBooked, setIsBooked] = useState(false);
-     const [showDatePicker, setShowDatePicker] = useState(false);
+// --- API functions (remain the same) ---
+const getVehicle = async (id) => {
+  const response = await fetch(`${API_BASE_URL}/vehicles/getOne?id=${id}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch vehicle data');
+  }
+  const data = await response.json();
+  console.log("API response data:", data);
+  return data;
+};
 
-     // Custom validator function for start date - disable past dates and times
-     const isValidStartDate = (currentDate, selectedDate) => {
-         // For date comparison, we need to check if it's today
-         const now = new Date();
-         const today = now.getDate();
-         const currentMonth = now.getMonth();
-         const currentYear = now.getFullYear();
-         
-         // Check if the selected date is today
-         const isToday = selectedDate.date() === today &&
-                        selectedDate.month() === currentMonth &&
-                        selectedDate.year() === currentYear;
-         
-         if (isToday) {
-             // If it's today, compare with current time
-             const currentHour = now.getHours();
-             const currentMinute = now.getMinutes();
-             
-             return selectedDate.hour() > currentHour || 
-                   (selectedDate.hour() === currentHour && 
-                    selectedDate.minute() >= currentMinute);
-         } else {
-             // For other dates, just check if it's in the future
-             return selectedDate.isAfter(now);
-         }
-     };
-     
-     // Custom validator function for end date - disable dates before start date
-     const isValidEndDate = (current) => {
-         if (!startDateTime) return true;
-         
-         // Get the start date/time values
-         let startHours, startMinutes, startYear, startMonth, startDay;
-         
-         if (startDateTime._isAMomentObject) {
-             // It's a Moment.js object
-             startHours = startDateTime.hours();
-             startMinutes = startDateTime.minutes();
-             startYear = startDateTime.year();
-             startMonth = startDateTime.month();
-             startDay = startDateTime.date();
-         } else {
-             // It's a JavaScript Date object
-             startHours = startDateTime.getHours();
-             startMinutes = startDateTime.getMinutes();
-             startYear = startDateTime.getFullYear();
-             startMonth = startDateTime.getMonth();
-             startDay = startDateTime.getDate();
-         }
-         
-         // Convert the moment object to a Date for comparison
-         const selected = current.toDate();
-         
-         // Check if same day
-         const sameDay = selected.getDate() === startDay &&
-                        selected.getMonth() === startMonth &&
-                        selected.getFullYear() === startYear;
-         
-         if (sameDay) {
-             // If same day, check time
-             return current.hour() > startHours ||
-                   (current.hour() === startHours &&
-                    current.minute() > startMinutes);
-         }
-         
-         // For different days, create comparable date objects
-         const startDate = new Date(startYear, startMonth, startDay);
-         const selectedDate = new Date(selected.getFullYear(), selected.getMonth(), selected.getDate());
-         
-         // If different day, just check if it's after start date
-         return selectedDate > startDate;
-     };
-     
-     const handleStartDateChange = (date) => {
-         // Check if date is valid before setting it
-         if (date && date._isValid !== false) {
-             // Ensure the selected date is not in the past
-             const now = new Date();
-             const dateObj = date._isAMomentObject ? date.toDate() : date;
-             
-             if (dateObj < now) {
-                 date = now;
-             }
-             
-             setStartDateTime(date);
-             // Set end time to be 1 hour after start time
-             if (date._isAMomentObject) {
-                 // If it's a Moment object, use Moment methods
-                 setEndDateTime(date.clone().add(1, 'hour'));
-             } else {
-                 // If it's a Date object, use Date methods
-                 setEndDateTime(new Date(date.valueOf() + 60 * 60 * 1000));
-             }
-         }
-     };
-     
-     const handleEndDateChange = (date) => {
-         // Check if date is valid before setting it
-         if (date && date._isValid !== false) {
-             // Convert both to comparable format
-             const startTime = startDateTime._isAMomentObject ? startDateTime.toDate() : startDateTime;
-             const endTime = date.toDate();
-             
-             // Only update if end time is after start time
-             if (endTime > startTime) {
-                 setEndDateTime(date);
-             } else {
-                 alert('End time must be after start time');
-                 // Keep the previous valid end time
-             }
-         }
-     };
-     
-     const handleShowBooking = () => {
-         setShowDatePicker(true);
-     };
-     
-     const handleBooking = () => {
-         setIsBooked(true);
-         
-         // Helper function to get hours/minutes from either Date or Moment objects
-         const getTimeValues = (dateObj) => {
-             // Check if it's a Moment object (has _isAMomentObject property)
-             if (dateObj._isAMomentObject) {
-                 return {
-                     hours: dateObj.hours(),
-                     minutes: dateObj.minutes(),
-                     date: dateObj.format('YYYY-MM-DD')
-                 };
-             } else {
-                 // It's a JavaScript Date object
-                 return {
-                     hours: dateObj.getHours(),
-                     minutes: dateObj.getMinutes(),
-                     date: dateObj.toISOString().split('T')[0]
-                 };
-             }
-         };
-         
-         // Get time values for start and end times
-         const startValues = getTimeValues(startDateTime);
-         const endValues = getTimeValues(endDateTime);
-         
-         // Format the times with the correct hours and minutes
-         const formattedStartTime = `${startValues.date}T${String(startValues.hours).padStart(2, '0')}:${String(startValues.minutes).padStart(2, '0')}:00`;
-         const formattedEndTime = `${endValues.date}T${String(endValues.hours).padStart(2, '0')}:${String(endValues.minutes).padStart(2, '0')}:00`;
-         
-         // Create the booking data object that would be sent to the backend
-         const bookingData = {
-             vehicleId: parseInt(id), // Convert to integer as backend expects a number
-             startTime: formattedStartTime, // Format: "2025-04-06T18:00:00"
-             endTime: formattedEndTime     // Format: "2025-04-06T19:00:00"
-         };
-         
-         // Log the data that would be sent to the backend
-         console.log('Booking data to be sent to backend:', bookingData);
-         
-         // Here you would typically make an API call to book the vehicle
-         // Example:
-         // await post('bookings/create', bookingData);
-     };
-     const {id} = useParams();
+const createBooking = async (bookingData) => {
+  console.log('Sending booking data to backend:', bookingData); // Log the exact data being sent
+  const response = await fetch(`${API_BASE_URL}/bookings/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(bookingData),
+  });
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error('Booking API error response:', errorBody);
+    throw new Error(`Failed to create booking. Server responded with: ${response.status} ${response.statusText}`);
+  }
+  const data = await response.json();
+  console.log('Booking response:', data);
+  return data;
+};
 
-     console.log(id);
-    const fetchOneVehicleId = async () => {
-        const response= await get(`vehicles/getOne`,
-            {params: {id}});
-        console.log("this is response " , response);
-        return response;
+// --- Component ---
+const VehicleDetail = () => {
+  const { id } = useParams();
+
+  // State variables (remain the same)
+  const [startDateTime, setStartDateTime] = useState(''); // Stores "YYYY-MM-DDTHH:mm"
+  const [endDateTime, setEndDateTime] = useState('');   // Stores "YYYY-MM-DDTHH:mm"
+  const [isBooked, setIsBooked] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [duration, setDuration] = useState(0);
+
+  // --- React Query Hooks (remain the same) ---
+  const { data, isLoading, error: queryError } = useQuery({
+    queryKey: ['oneVehicle', id],
+    queryFn: () => getVehicle(id),
+    enabled: !!id,
+  });
+
+  const bookingMutation = useMutation({
+    mutationFn: createBooking,
+    onSuccess: (data) => {
+      console.log('Booking successful:', data);
+      setIsBooked(true);
+    },
+    onError: (error) => {
+      console.error('Booking failed mutation:', error);
+      alert(`Booking failed: ${error.message}`);
+      setIsBooked(false);
     }
+  });
 
-    const {data , isLoading , error} = useQuery({
-        queryKey: ["oneVehicle" , id],
-        queryFn: fetchOneVehicleId
+  // --- Effects (remain the same) ---
+  useEffect(() => {
+    if (startDateTime && endDateTime) {
+      const start = new Date(startDateTime);
+      const end = new Date(endDateTime);
+      if (!isNaN(start.getTime()) && !isNaN(end.getTime()) && end > start) {
+        const diffMillis = end - start;
+        const diffHours = Math.round(diffMillis / (1000 * 60 * 60));
+        setDuration(diffHours);
+      } else {
+        setDuration(0);
+      }
+    } else {
+      setDuration(0);
+    }
+  }, [startDateTime, endDateTime]);
 
-    });
+  // --- Helper Functions (remain the same) ---
+  const formatDateTime = (dateString) => {
+    // This function is for DISPLAY only, still correct for 24h format
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Invalid Date';
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  };
+
+  const getMinDateTime = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
+  };
+  const minDateTime = getMinDateTime();
+
+  // --- Event Handlers (remain the same, except handleBooking) ---
+  const handleStartDateChange = (value) => {
+    setStartDateTime(value);
+    if (value) {
+      const start = new Date(value);
+      if (!isNaN(start.getTime())) {
+        const end = new Date(start.getTime() + 60 * 60 * 1000);
+        end.setMinutes(end.getMinutes() - end.getTimezoneOffset());
+        setEndDateTime(end.toISOString().slice(0, 16));
+      } else {
+        setEndDateTime('');
+      }
+    } else {
+      setEndDateTime('');
+    }
+  };
+
+  const handleEndDateChange = (value) => {
+    if (startDateTime && value) {
+      const start = new Date(startDateTime);
+      const end = new Date(value);
+      if (!isNaN(start.getTime()) && !isNaN(end.getTime()) && end > start) {
+        setEndDateTime(value);
+      } else {
+         setEndDateTime(value);
+      }
+    } else {
+      setEndDateTime(value);
+    }
+  };
+
+  const handleShowBooking = () => {
+    setShowDatePicker(true);
+    const nowValue = getMinDateTime();
+    setStartDateTime(nowValue);
+    const start = new Date(nowValue);
+     if (!isNaN(start.getTime())) {
+        const end = new Date(start.getTime() + 60 * 60 * 1000);
+        end.setMinutes(end.getMinutes() - end.getTimezoneOffset());
+        setEndDateTime(end.toISOString().slice(0, 16));
+      }
+  };
+
+  // --- *** MODIFIED handleBooking function *** ---
+  const handleBooking = () => {
+     if (!startDateTime || !endDateTime || duration <= 0) {
+       alert('Please select a valid start and end time.');
+       return;
+     }
+
+    // The state variables (startDateTime, endDateTime) hold "YYYY-MM-DDTHH:mm" (local time)
+    // Simply append ":00" to match the backend requirement "YYYY-MM-DDTHH:mm:ss"
+
+    const formattedStartTime = `${startDateTime}:00`;
+    const formattedEndTime = `${endDateTime}:00`;
+
+    // Now formattedStartTime and formattedEndTime are exactly like "2025-04-09T19:00:00"
+
+    const bookingData = {
+      vehicleId: parseInt(id, 10),
+      startTime: formattedStartTime, // Send in "YYYY-MM-DDTHH:mm:ss" format
+      endTime: formattedEndTime    // Send in "YYYY-MM-DDTHH:mm:ss" format
+    };
+
+    // Send booking request
+    bookingMutation.mutate(bookingData);
+  };
+  // --- *** End of modification *** ---
 
 
-     if (isLoading) return <p>Loading...</p>;
-     if (error) return <p>Error</p>;
+  // --- Render Logic (remain the same) ---
+  if (isLoading) return <p>Loading vehicle details...</p>;
+  if (queryError) return <p>Error loading vehicle: {queryError.message}</p>;
+  if (!data || !data.data) return <p>Vehicle not found.</p>;
 
-    return (
-        <div className="vehicle-detail-container">
-            <div className="vehicle-info">
-                <h1>{data.data.name}</h1>
-                <img 
-                    src={`http://localhost:8080/${data.data.photoUrl}`} 
-                    alt={data.data.name}
-                    className="vehicle-image"
-                />
-                <div className="vehicle-specs">
-                    <p><strong>Model:</strong> {data.data.model}</p>
-                    <p><strong>Plate Number:</strong> {data.data.plateNum}</p>
-                    <p><strong>Price:</strong> ${data.data.price}/day</p>
-                    <p><strong>Type:</strong> {data.data.type}</p>
-                </div>
-            </div>
-            
-            <div className="booking-section">
-                <h2>Book this Vehicle</h2>
-                
-                {!showDatePicker ? (
-                    <button 
-                        className="book-button"
-                        onClick={handleShowBooking}
-                    >
-                        Book Now
-                    </button>
-                ) : (
-                    <>
-                        <div className="date-time-container">
-                            <div className="date-time-header">
-                                <span>Select start time:</span>
-                                <span>Select end time:</span>
-                            </div>
-                            <div className="date-time-pickers">
-                                <Datetime
-                                    value={startDateTime}
-                                    onChange={handleStartDateChange}
-                                    dateFormat="YYYY-MM-DD"
-                                    timeFormat="HH:mm"
-                                    closeOnSelect={false}
-                                    className="datetime-picker"
-                                    minDate={new Date()}
-                                    isValidDate={(current) => isValidStartDate(new Date(), current)}
-                                    inputProps={{ readOnly: true }}
-                                    timeConstraints={{
-                                        hours: { min: 0, max: 23 },
-                                        minutes: { min: 0, max: 59, step: 5 }
-                                    }}
-                                />
-                                <Datetime
-                                    value={endDateTime}
-                                    onChange={handleEndDateChange}
-                                    dateFormat="YYYY-MM-DD"
-                                    timeFormat="HH:mm"
-                                    closeOnSelect={false}
-                                    className="datetime-picker"
-                                    minDate={startDateTime}
-                                    isValidDate={isValidEndDate}
-                                    inputProps={{ readOnly: true }}
-                                    timeConstraints={{
-                                        hours: { min: 0, max: 23 },
-                                        minutes: { min: 0, max: 59, step: 5 }
-                                    }}
-                                />
-                            </div>
-                            
-                            {startDateTime && endDateTime && (
-                                <p className="selected-time">
-                                    Duration: {Math.round((endDateTime - startDateTime) / (1000 * 60 * 60))} hour(s)
-                                </p>
-                            )}
-                        </div>
-                        
-                        <button 
-                            className="book-button confirm-button" 
-                            onClick={handleBooking}
-                            disabled={isBooked}
-                        >
-                            {isBooked ? 'Booked!' : 'Confirm Booking'}
-                        </button>
-                        
-                        {isBooked && (
-                            <p className="booking-confirmation">
-                                Your booking has been confirmed from {startDateTime.toLocaleString()} to {endDateTime.toLocaleString()}
-                            </p>
-                        )}
-                    </>
-                )}
-            </div>
+  const vehicle = data.data;
+
+  return (
+    <div className="vehicle-detail-container">
+      {/* Vehicle Info Section */}
+      <div className="vehicle-info">
+        <h1>{vehicle.name}</h1>
+        {vehicle.photoUrl && (
+          <img
+            src={`${API_BASE_URL}/${vehicle.photoUrl.startsWith('/') ? vehicle.photoUrl.substring(1) : vehicle.photoUrl}`}
+            alt={vehicle.name}
+            className="vehicle-image"
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
+        )}
+        <div className="vehicle-specs">
+          <p><strong>Model:</strong> {vehicle.model || 'N/A'}</p>
+          <p><strong>Plate Number:</strong> {vehicle.plateNum || 'N/A'}</p>
+          <p><strong>Price:</strong> ${vehicle.price ? vehicle.price.toFixed(2) : 'N/A'}/day</p>
+          <p><strong>Type:</strong> {vehicle.type || 'N/A'}</p>
         </div>
-    )
-}
+      </div>
+
+      {/* Booking Section */}
+      <div className="booking-section">
+        <h2>Book this Vehicle</h2>
+
+        {!showDatePicker ? (
+          <button
+            className="book-button"
+            onClick={handleShowBooking}
+            disabled={isBooked}
+          >
+            {isBooked ? 'Booked!' : 'Book Now'}
+          </button>
+        ) : (
+          <>
+            {/* Date Time Pickers */}
+            <div className="date-time-container">
+              <div className="date-time-header">
+                <span>Select start time:</span>
+                <span>Select end time:</span>
+              </div>
+              <div className="date-time-pickers">
+                <div className="datetime-picker">
+                  <input
+                    type="datetime-local"
+                    min={minDateTime}
+                    value={startDateTime}
+                    onChange={(e) => handleStartDateChange(e.target.value)}
+                    disabled={isBooked || bookingMutation.isPending}
+                  />
+                </div>
+                <div className="datetime-picker">
+                  <input
+                    type="datetime-local"
+                    min={startDateTime || minDateTime}
+                    value={endDateTime}
+                    onChange={(e) => handleEndDateChange(e.target.value)}
+                    disabled={isBooked || bookingMutation.isPending || !startDateTime}
+                  />
+                </div>
+              </div>
+
+              {/* Display selected times formatted in 24h (for user feedback) */}
+              {startDateTime && endDateTime && (
+                <div className="selected-time-details" style={{ marginTop: '10px', fontSize: '0.9em' }}>
+                   <p>Selected: {formatDateTime(startDateTime)} to {formatDateTime(endDateTime)}</p>
+                   {duration > 0 ? (
+                     <p>Duration: {duration} hour(s)</p>
+                   ) : (
+                     <p style={{ color: 'orange' }}>Duration: End time must be after start time.</p>
+                   )}
+                </div>
+              )}
+            </div>
+
+            {/* Booking Button */}
+            <button
+              className={`book-button ${isBooked ? '' : 'confirm-button'}`}
+              onClick={handleBooking}
+              disabled={isBooked || bookingMutation.isPending || !startDateTime || !endDateTime || duration <= 0}
+            >
+              {bookingMutation.isPending ? 'Processing...' : (isBooked ? 'Booked!' : 'Confirm Booking')}
+            </button>
+
+            {/* Booking Confirmation Message (uses display format) */}
+            {isBooked && (
+              <p className="booking-confirmation">
+                Your booking has been confirmed from {formatDateTime(startDateTime)} to {formatDateTime(endDateTime)}
+              </p>
+            )}
+
+             {/* Display API errors */}
+            {bookingMutation.isError && (
+               <p className="error-message" style={{ color: 'red', marginTop: '10px' }}>
+                  Booking Error: {bookingMutation.error.message}
+               </p>
+            )}
+
+            {/* Debug section - Shows the format being sent */}
+            <div style={{
+              marginTop: '20px', padding: '10px', backgroundColor: '#1a1a1a',
+              borderRadius: '4px', fontSize: '12px', color: '#90caf9', wordBreak: 'break-all',
+              border: '1px solid rgba(255, 255, 255, 0.1)', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}>
+              <p>Debug Info (Format Sent to Backend):</p>
+              <pre style={{ whiteSpace: 'pre-wrap', fontSize: '11px', color: '#e0e0e0' }}>
+                {JSON.stringify({
+                  vehicleId: id ? parseInt(id, 10) : null,
+                  // Show the actual strings being sent in the required format
+                  startTimeToSend: startDateTime ? `${startDateTime}:00` : null,
+                  endTimeToSend: endDateTime ? `${endDateTime}:00` : null,
+                  currentState: { startDateTime, endDateTime, duration, isBooked }
+                }, null, 2)}
+              </pre>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default VehicleDetail;
