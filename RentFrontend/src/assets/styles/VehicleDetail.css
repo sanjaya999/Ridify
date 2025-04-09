@@ -1,0 +1,530 @@
+/* VehicleDetail.css */
+
+.vehicle-detail-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.vehicle-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.vehicle-info h1 {
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 2rem;
+}
+
+.vehicle-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.vehicle-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.vehicle-specs p {
+  margin: 0;
+  font-size: 1rem;
+  color: #666;
+}
+
+.booking-section {
+  padding: 1.5rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-section h2 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+/* Datetime picker styling */
+.datetime-picker {
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+/* React Datetime custom styling */
+.rdtPicker {
+  border: 1px solid #444;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 12px;
+  background-color: #222 !important;
+  width: 100%;
+  max-width: none;
+}
+
+.rdtPicker th {
+  border-bottom: 1px solid #444;
+  padding: 8px;
+  text-align: center;
+  font-weight: 600;
+  color: #fff;
+}
+
+.rdtPicker td {
+  padding: 5px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 4px;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.rdtPicker td.rdtDay:hover,
+.rdtPicker td.rdtHour:hover,
+.rdtPicker td.rdtMinute:hover,
+.rdtPicker td.rdtSecond:hover {
+  background-color: #444;
+  border-radius: 4px;
+}
+
+/* Custom time picker styling */
+.date-time-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+}
+
+.date-time-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  padding: 0 0.5rem;
+}
+
+.date-time-header span {
+  font-weight: 500;
+  color: white;
+  flex: 1;
+  text-align: center;
+}
+
+.date-time-pickers {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.date-time-pickers .rdt {
+  width: 48%;
+}
+
+.datetime-picker {
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+/* Make the calendar look better */
+.rdtPicker {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  background-color: white;
+}
+
+/* Improve the time picker section */
+.rdtTime {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #333 !important;
+  border-radius: 6px;
+}
+
+/* Style the time display */
+.rdtCount {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #444;
+  border-radius: 4px;
+  padding: 5px 10px;
+  margin: 0 5px;
+  min-width: 40px;
+  display: inline-block;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Style the up/down buttons */
+.rdtBtn {
+  cursor: pointer;
+  color: #ccc;
+  background-color: #555;
+  border-radius: 4px;
+  padding: 5px 8px;
+  margin: 0 2px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.rdtBtn:hover {
+  background-color: #666;
+  color: #fff;
+}
+
+/* Style the time separator */
+.rdtCounterSeparator {
+  color: #ccc;
+  font-weight: bold;
+  margin: 0 5px;
+}
+
+/* Fix the time layout */
+.rdtTime table {
+  margin: 0 auto;
+}
+
+.rdtTime table td {
+  padding: 5px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Make the time picker more compact */
+.rdtOpen .rdtPicker {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  left: 0 !important;
+}
+
+/* Style the input field */
+.rdt input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 1rem;
+  color: #333;
+  background-color: white;
+  transition: border-color 0.3s ease;
+}
+
+.rdt input:focus {
+  outline: none;
+  border-color: #333;
+  box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.1);
+}
+
+.rdtPicker td.rdtActive,
+.rdtPicker td.rdtActive:hover {
+  background-color: #333;
+  color: white;
+  border-radius: 4px;
+}
+
+.rdtPicker td.rdtToday:before {
+  border-bottom-color: #333;
+}
+
+.rdtPicker .rdtTimeToggle {
+  padding: 8px;
+  border-radius: 4px;
+  color: #333;
+  font-weight: 600;
+}
+
+.rdtPicker .rdtTimeToggle:hover {
+  background-color: #f5f5f5;
+}
+
+/* Input field styling */
+.rdt input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #444;
+  border-radius: 4px;
+  font-size: 1rem;
+  color: white;
+  background-color: #333;
+  transition: border-color 0.3s ease;
+}
+
+.rdt input:focus {
+  outline: none;
+  border-color: #333;
+  box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.1);
+}
+
+.selected-time {
+  margin: 1rem 0;
+  font-weight: 500;
+  color: white;
+  width: 100%;
+  text-align: center;
+}
+
+.validation-message {
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  background-color: rgba(255, 87, 34, 0.2);
+  border-left: 4px solid #ff5722;
+  color: #ff9800;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  width: 100%;
+  text-align: center;
+}
+
+.book-button {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+  align-self: flex-start;
+}
+
+.book-button:hover:not(:disabled) {
+  background-color: #555;
+}
+
+.book-button:disabled {
+  background-color: #888;
+  cursor: not-allowed;
+}
+
+.confirm-button {
+  margin-top: 1rem;
+  background-color: #2e7d32;
+}
+
+.confirm-button:hover:not(:disabled) {
+  background-color: #1b5e20;
+}
+
+.booking-confirmation {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #e8f5e9;
+  border-radius: 4px;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .vehicle-detail-container {
+    grid-template-columns: 1fr;
+    padding: 1.5rem;
+  }
+  
+  .vehicle-image {
+    height: 250px;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .vehicle-detail-container {
+    background: #1a1a1a;
+  }
+  
+  .vehicle-info h1,
+  .booking-section h2 {
+    color: #f0f0f0;
+  }
+  
+  .vehicle-specs p,
+  .selected-time {
+    color: #ccc;
+  }
+  
+  .booking-section {
+    background: #2a2a2a;
+  }
+  
+  .book-button {
+    background-color: #f0f0f0;
+    color: #121212;
+  }
+  
+  .book-button:hover:not(:disabled) {
+    background-color: #ccc;
+  }
+  
+  .book-button:disabled {
+    background-color: #666;
+    color: #aaa;
+  }
+  
+  .booking-confirmation {
+    background-color: #1b5e20;
+    color: #e8f5e9;
+  }
+  
+  /* Dark mode for datetime picker */
+  .rdtPicker {
+    background-color: #2a2a2a;
+    border-color: #444;
+  }
+  
+  .rdtPicker th {
+    color: #f0f0f0;
+    border-bottom-color: #444;
+  }
+  
+  .rdtPicker td {
+    color: #ccc;
+  }
+  
+  .rdtTime {
+    background-color: #333;
+  }
+  
+  .rdtCount {
+    background-color: #444;
+    color: #f0f0f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  
+  .rdtBtn {
+    background-color: #555;
+    color: #ccc;
+  }
+  
+  .rdtBtn:hover {
+    background-color: #666;
+    color: #fff;
+  }
+  
+  .rdtCounterSeparator {
+    color: #bbb;
+  }
+  
+  .rdt input {
+    background-color: #333;
+    color: #f0f0f0;
+    border-color: #444;
+  }
+  
+  .rdt input:focus {
+    border-color: #f0f0f0;
+    box-shadow: 0 0 0 2px rgba(240, 240, 240, 0.1);
+  }
+  
+  /* Dark mode for datetime picker */
+  .rdtPicker {
+    background-color: #2a2a2a;
+    border-color: #444;
+  }
+  
+  .rdtPicker th {
+    color: #f0f0f0;
+    border-bottom-color: #444;
+  }
+  
+  .rdtPicker td {
+    color: #ccc;
+  }
+  
+  .rdtPicker td.rdtDay:hover,
+  .rdtPicker td.rdtHour:hover,
+  .rdtPicker td.rdtMinute:hover,
+  .rdtPicker td.rdtSecond:hover {
+    background-color: #444;
+  }
+  
+  .rdtPicker td.rdtActive,
+  .rdtPicker td.rdtActive:hover {
+    background-color: #f0f0f0;
+    color: #121212;
+  }
+  
+  .rdtPicker td.rdtToday:before {
+    border-bottom-color: #f0f0f0;
+  }
+  
+  .rdtPicker .rdtTimeToggle {
+    color: #f0f0f0;
+  }
+  
+  .rdtPicker .rdtTimeToggle:hover {
+    background-color: #444;
+  }
+  
+  .rdt input {
+    background-color: #333;
+    color: #f0f0f0;
+    border-color: #444;
+  }
+  
+  .rdt input:focus {
+    border-color: #f0f0f0;
+    box-shadow: 0 0 0 2px rgba(240, 240, 240, 0.1);
+  }
+  
+  /* Dark mode for time picker */
+  .rdtTime {
+    background-color: #222;
+  }
+  
+  .rdtCounter {
+    background-color: #2a2a2a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+  
+  .rdtCounter .rdtCount {
+    background-color: #333;
+    color: #f0f0f0;
+  }
+  
+  .rdtCounter .rdtBtn {
+    background-color: #444;
+    color: #ccc;
+  }
+  
+  .rdtCounter .rdtBtn:hover {
+    background-color: #555;
+    color: #f0f0f0;
+  }
+  
+  .rdtCounter .rdtBtn:first-child,
+  .rdtCounter .rdtBtn:last-child {
+    background-color: #444;
+  }
+  
+  .rdtCounter .rdtBtn:first-child:hover,
+  .rdtCounter .rdtBtn:last-child:hover {
+    background-color: #555;
+  }
+  
+  .rdtCounterSeparator {
+    color: #aaa;
+  }
+  
+  .confirm-button {
+    background-color: #4caf50;
+    color: #121212;
+  }
+  
+  .confirm-button:hover:not(:disabled) {
+    background-color: #388e3c;
+  }
+}
