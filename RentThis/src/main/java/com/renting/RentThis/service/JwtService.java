@@ -85,4 +85,27 @@ public class JwtService {
             return false;
         }
     }
+
+
+    public String generateBookingVerificationToken(Long userId , Long vehicleId,
+                                                   String startTime , String endTime , long minutesToExpire){
+        Map<String , Object> claims = new HashMap<>();
+        claims.put("userId" , userId);
+        claims.put("vehicleId" , vehicleId);
+        claims.put("startTime" , startTime);
+        claims.put("endTime" , endTime);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(String.valueOf(userId))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + minutesToExpire * 60 * 1000))
+                .signWith(getSignInKey(accessSecret), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public Claims extractBookingVerificationClaims(String token) {
+        return extractAllClaims(token, accessSecret);
+    }
+
 }
