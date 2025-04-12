@@ -2,6 +2,7 @@ package com.renting.RentThis.service;
 
 import com.renting.RentThis.dto.request.BookingRequest;
 import com.renting.RentThis.dto.response.BookingResponse;
+import com.renting.RentThis.dto.response.BookingVerificationResponse;
 import com.renting.RentThis.entity.Booking;
 import com.renting.RentThis.entity.User;
 import com.renting.RentThis.entity.Vehicle;
@@ -10,6 +11,7 @@ import com.renting.RentThis.repository.BookingRespository;
 import com.renting.RentThis.repository.UserRepository;
 import com.renting.RentThis.repository.VehicleRepository;
 import com.renting.RentThis.util.ResponseMapper;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,6 +48,9 @@ public class BookingService {
 
     @Autowired
     private PaymentService paymentService;
+    @Autowired
+    private JwtService jwtService;
+
     public BookingResponse addBooking(BookingRequest request ){
 
         if (request.getStartTime().isAfter(request.getEndTime())) {
@@ -157,6 +162,106 @@ public class BookingService {
                         .build())
                 .collect(Collectors.toList());
     }
+    public BookingVerificationResponse verifyTime(BookingRequest request) {
+        if (request.getStartTime().isAfter(request.getEndTime())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start time must be before end time");
+        }
+
+        Vehicle vehicle = vehicleRepository.findById(request.getVehicleId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found"));
+
+        List<Booking> existingBooking = bookingRespository.findByVehicleId(vehicle.getId());
+        List<IntervalSchedulingService.TimeSlot> overlappingSlots = intervalSchedulingService
+                .findOverlappingSlots(existingBooking, request.getStartTime(), request.getEndTime());
+
+
+        if (!overlappingSlots.isEmpty()) {
+            List<IntervalSchedulingService.TimeSlot> availableSlots = intervalSchedulingService
+                    .findAvailableTimeSlots(existingBooking,
+                            request.getStartTime().minusHours(6),
+                            request.getEndTime().plusHours(6));
+
+            String availableTimes = availableSlots.stream()
+                    .map(slot -> String.format("%s - %s",
+                            slot.getStart().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                            slot.getEnd().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))))
+                    .collect(Collectors.joining(", "));
+
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Requested time unavailable. Nearby availability: " + availableTimes);
+        }
+
+        String email = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        BigDecimal amount = calculateAmount(vehicle , request.getStartTime() , request.getEndTime());
+        // Generate booking verification token
+        String token =  jwtService.generateBookingVerificationToken(
+                user.getId(),
+                vehicle.getId(),
+                request.getStartTime().toString(),
+                request.getEndTime().toString(),
+                10 // token valid for 10 minutes
+        );
+        return  new BookingVerificationResponse(token , amount);
+    }
+
+
+    public BookingResponse confirmBooking(String jwtToken) {
+        Claims claims = jwtService.extractBookingVerificationClaims(jwtToken);
+
+        Long userId = Long.parseLong(claims.get("userId").toString());
+        Long vehicleId = Long.parseLong(claims.get("vehicleId").toString());
+        LocalDateTime startTime = LocalDateTime.parse(claims.get("startTime").toString());
+        LocalDateTime endTime = LocalDateTime.parse(claims.get("endTime").toString());
+
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // ⛔ Check again if someone else booked in the meantime
+        List<Booking> existingBookings = bookingRespository.findByVehicleId(vehicleId);
+        if (!intervalSchedulingService.findOverlappingSlots(existingBookings, startTime, endTime).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Slot already booked");
+        }
+
+        // ✅ Recalculate amount
+        BigDecimal amount = calculateAmount(vehicle, startTime, endTime);
+
+        try {
+            paymentService.processInternalPayment(user, vehicle.getOwner(), amount, "Booking " + LocalDateTime.now());
+        } catch (InsufficientBalanceException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+
+        Booking booking = new Booking();
+        booking.setUser(user);
+        booking.setVehicle(vehicle);
+        booking.setStartTime(startTime);
+        booking.setEndTime(endTime);
+        booking.setStatus("Confirmed");
+
+        Booking saved = bookingRespository.save(booking);
+
+        return BookingResponse.builder()
+                .id(saved.getId())
+                .startDate(saved.getStartTime())
+                .endDate(saved.getEndTime())
+                .vehicle(ResponseMapper.toVehicleMap(saved.getVehicle()))
+                .bookedUser(ResponseMapper.toUserMap(saved.getUser()))
+                .status(saved.getStatus())
+                .build();
+    }
+
+
+    private BigDecimal calculateAmount(Vehicle vehicle, LocalDateTime start, LocalDateTime end) {
+        long hours = Duration.between(start, end).toHours();
+        if (hours == 0) hours = 1; // Minimum 1 hour
+        return vehicle.getPrice().multiply(BigDecimal.valueOf(hours));
+    }
+
 
 
 }
