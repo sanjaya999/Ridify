@@ -195,7 +195,12 @@ public class BookingService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        BigDecimal amount = calculateAmount(vehicle , request.getStartTime() , request.getEndTime());
+        long totalHours = Duration.between(request.getStartTime(), request.getEndTime()).toHours();
+        if (totalHours == 0) totalHours = 1;
+
+        BigDecimal hourlyRate = vehicle.getPrice();
+        BigDecimal totalAmount = hourlyRate.multiply(BigDecimal.valueOf(totalHours));
+
         // Generate booking verification token
         String token =  jwtService.generateBookingVerificationToken(
                 user.getId(),
@@ -204,8 +209,12 @@ public class BookingService {
                 request.getEndTime().toString(),
                 10 // token valid for 10 minutes
         );
-        return  new BookingVerificationResponse(token , amount);
-    }
+        return BookingVerificationResponse.builder()
+                .token(token)
+                .hourlyRate(hourlyRate)
+                .totalHours(totalHours)
+                .totalAmount(totalAmount)
+                .build();    }
 
 
     public BookingResponse confirmBooking(String jwtToken) {
@@ -261,6 +270,8 @@ public class BookingService {
         if (hours == 0) hours = 1; // Minimum 1 hour
         return vehicle.getPrice().multiply(BigDecimal.valueOf(hours));
     }
+
+
 
 
 
