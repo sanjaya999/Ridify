@@ -2,13 +2,15 @@
 package com.renting.RentThis.dto.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-@AllArgsConstructor
+@Builder
 public class BookingVerificationResponse {
     private String token;
-    private BigDecimal amount;
-}
+    private BigDecimal hourlyRate;
+    private long totalHours;
+    private BigDecimal totalAmount;}
