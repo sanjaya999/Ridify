@@ -8,6 +8,7 @@ import PublicRoute from './components/ProtectedRoutes/PublicRoute';
 import Bookings from './components/Bookings/Bookings';
 import './App.css';
 import VehicleDetail from "./components/VehicleBooking/VehicleDetail.jsx";
+import ConfirmBooking from "./components/VehicleBooking/ConfirmBooking.jsx";
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
           <Route path="about" element={<div>About Page</div>} />
           <Route path="contact" element={<div>Contact Page</div>} />
           <Route path="/aboutVehicle/:id" element={<VehicleDetail />} />
-
+          <Route path="/confirm-booking" element={<ConfirmBooking />} />
 
           <Route element={<PrivateRoute />}>
             <Route path="vehicles" element={<div>Vehicles Page</div>} />
