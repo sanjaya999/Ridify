@@ -1,44 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import '../../assets/styles/VehicleDetail.css';
 
-// API base URL
-const API_BASE_URL = 'http://localhost:8080';
+// --- API functions ---
+import { get, post } from '../../api/api';
 
-// --- API functions (remain the same) ---
+// Fetch single vehicle details
 const getVehicle = async (id) => {
-  const response = await fetch(`${API_BASE_URL}/vehicles/getOne?id=${id}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch vehicle data');
+  try {
+    return await get(`/vehicles/getOne?id=${id}`);
+  } catch (error) {
+    console.error('Failed to fetch vehicle data', error);
+    throw error;
   }
-  const data = await response.json();
-  console.log("API response data:", data);
-  return data;
 };
 
-const createBooking = async (bookingData) => {
-  console.log('Sending booking data to backend:', bookingData); // Log the exact data being sent
-  const response = await fetch(`${API_BASE_URL}/bookings/create`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(bookingData),
-  });
-  if (!response.ok) {
-    const errorBody = await response.text();
-    console.error('Booking API error response:', errorBody);
-    throw new Error(`Failed to create booking. Server responded with: ${response.status} ${response.statusText}`);
+const API_BASE_URL = 'http://localhost:8080';
+
+// Verify booking availability
+const verifyBooking = async (bookingData) => {
+  try {
+    return await post('/api/v1/book/verify', bookingData);
+  } catch (error) {
+    console.error('Verify booking API error:', error);
+    throw error;
   }
-  const data = await response.json();
-  console.log('Booking response:', data);
-  return data;
 };
 
 // --- Component ---
 const VehicleDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   // State variables (remain the same)
   const [startDateTime, setStartDateTime] = useState(''); // Stores "YYYY-MM-DDTHH:mm"
@@ -55,14 +48,35 @@ const VehicleDetail = () => {
   });
 
   const bookingMutation = useMutation({
-    mutationFn: createBooking,
+    mutationFn: verifyBooking,
     onSuccess: (data) => {
-      console.log('Booking successful:', data);
-      setIsBooked(true);
+      // Handle API structure: { success, message, status, data: { token, hourlyRate, ... } }
+      if (data && data.success && data.data) {
+        localStorage.setItem('bookingToken', data.data.token);
+        navigate('/confirm-booking', {
+          state: {
+            hourlyRate: data.data.hourlyRate,
+            totalHours: data.data.totalHours,
+            totalAmount: data.data.totalAmount
+          }
+        });
+      } else if (data && data.message) {
+        setIsBooked(false);
+        alert(data.message);
+      } else {
+        setIsBooked(false);
+        alert('Unexpected response from server.');
+      }
     },
     onError: (error) => {
-      console.error('Booking failed mutation:', error);
-      alert(`Booking failed: ${error.message}`);
+      // Try to extract error message from API response
+      let errorMsg = 'Booking failed.';
+      if (error?.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      } else if (error?.message) {
+        errorMsg = error.message;
+      }
+      alert(errorMsg);
       setIsBooked(false);
     }
   });
@@ -161,18 +175,16 @@ const VehicleDetail = () => {
     const formattedStartTime = `${startDateTime}:00`;
     const formattedEndTime = `${endDateTime}:00`;
 
-    // Now formattedStartTime and formattedEndTime are exactly like "2025-04-09T19:00:00"
-
     const bookingData = {
       vehicleId: parseInt(id, 10),
-      startTime: formattedStartTime, // Send in "YYYY-MM-DDTHH:mm:ss" format
-      endTime: formattedEndTime    // Send in "YYYY-MM-DDTHH:mm:ss" format
+      startTime: formattedStartTime,
+      endTime: formattedEndTime
     };
 
-    // Send booking request
+    // Send booking verification request
     bookingMutation.mutate(bookingData);
   };
-  // --- *** End of modification *** ---
+  // --- *** End of modification ***
 
 
   // --- Render Logic (remain the same) ---
