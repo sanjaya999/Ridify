@@ -8,9 +8,11 @@ import com.renting.RentThis.dto.response.BookingVerificationResponse;
 import com.renting.RentThis.dto.response.VehicleResponse;
 import com.renting.RentThis.service.BookingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -60,9 +62,29 @@ public class BookingController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<BookingVerificationResponse> verifyBooking(@RequestBody BookingRequest request) {
-        BookingVerificationResponse response = bookingService.verifyTime(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> verifyBooking(@RequestBody BookingRequest request) {
+        try {
+            BookingVerificationResponse response = bookingService.verifyTime(request);
+            return ResponseEntity.ok(ApiResponse.<BookingVerificationResponse>builder()
+                    .success(true)
+                    .status(200)
+                    .data(response)
+                    .message("Time slot available")
+                    .build());
+        } catch (ResponseStatusException ex) {
+            // Handle the conflict status exception specifically
+            if (ex.getStatusCode() == HttpStatus.CONFLICT) {
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body(ApiResponse.<BookingVerificationResponse>builder()
+                                .success(false)
+                                .status(409)
+                                .message(ex.getReason())
+                                .build());
+            }
+            // Re-throw other exceptions
+            throw ex;
+        }
     }
 
     @PostMapping("/confirm")
