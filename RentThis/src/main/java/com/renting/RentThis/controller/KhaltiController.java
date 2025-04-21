@@ -1,14 +1,17 @@
 package com.renting.RentThis.controller;
 
+import com.renting.RentThis.dto.request.BookingConfirmRequest;
+import com.renting.RentThis.dto.request.BookingRequest;
+import com.renting.RentThis.dto.request.KhaltiCheckStatusRequest;
 import com.renting.RentThis.entity.User;
 import com.renting.RentThis.entity.Vehicle;
 import com.renting.RentThis.repository.VehicleRepository;
-import com.renting.RentThis.service.PaymentService;
-import com.renting.RentThis.service.UserService;
-import com.renting.RentThis.service.VehicleService;
+import com.renting.RentThis.service.*;
+import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +19,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/payments")
-
 public class KhaltiController {
 
     private static final Logger log = LoggerFactory.getLogger(KhaltiController.class);
@@ -37,20 +40,39 @@ public class KhaltiController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    JwtService jwtService;
+
+    @Autowired
+    BookingService bookingService;
+
+
 
     @PostMapping("/khalti")
-    public ResponseEntity<?> initateKhaltiPaymet(@RequestParam("id") Long vehicleId) {
-        User currentUser = userService.getCurrentUser();
+    public ResponseEntity<?> initateKhaltiPaymet(@RequestBody BookingConfirmRequest request) {
+        Claims claims = jwtService.extractBookingVerificationClaims(request.getToken());
+        Long vehicleId = Long.parseLong(claims.get("vehicleId").toString());
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new EntityNotFoundException("Vehicle not found with id: " + vehicleId));
-        BigDecimal amount = vehicle.getPrice();
+                .orElseThrow(() -> new EntityNotFoundException("Vehicle not found"));
 
+        Long userId = Long.parseLong(claims.get("userId").toString());
+        User currentUser = userService.getCurrentUser();
+        if(!userId.equals(currentUser.getId())){
+            throw new RuntimeException("you are not the user ");
+        }
+        LocalDateTime startTime = LocalDateTime.parse(claims.get("startTime").toString());
+
+        LocalDateTime endTime = LocalDateTime.parse(claims.get("endTime").toString());
+
+        BigDecimal dbAmount =bookingService.calculateAmount(vehicle, startTime, endTime);
+        BigDecimal multiplier = new BigDecimal("100");
+        BigDecimal amount = dbAmount.multiply(multiplier);
         String rentId = "veh" + currentUser.getId() + "-" + vehicle.getId();
         String vehicleName = vehicle.getName();
         Long vehicleOwnerId = vehicle.getOwner().getId();
         Long currentUserId = currentUser.getId();
 
-        String returnUrl = "http://localhost:8080/api/v1/payments/khaltiCall/callback";
+        String returnUrl = "http://localhost:5173/khalti-callback";
         String customerName = currentUser.getName();
         String customerEmail = currentUser.getEmail();
         String cusotmerPhone = "1234567891";
@@ -62,48 +84,82 @@ public class KhaltiController {
         return ResponseEntity.ok(response);
 
     }
-    @GetMapping("/khaltiCall/callback")
-    public ResponseEntity<?> handleKhaltiCallback(@RequestParam Map<String, String> params) {
+//    @GetMapping("/khaltiCall/callback")
+//    public ResponseEntity<?> handleKhaltiCallback(@RequestParam Map<String, String> params) {
+//
+//
+//        String status = params.get("status");
+//        String pidx = params.get("pidx");
+//        String amountStr = params.getOrDefault("amount", params.get("total_amount"));
+//        String transactionId = params.get("transaction_id");
+//        String purchaseOrderId = params.get("purchase_order_id");
+//        String purchaseOrderName = params.get("purchase_order_name");
+//
+//        Map<String, Object> response = new HashMap<>();
+//        response.put("pidx", pidx);
+//        response.put("status", status);
+//        response.put("amount", amountStr);
+//        response.put("purchase_order_id", purchaseOrderId);
+//        response.put("purchase_order_name", purchaseOrderName);
+//
+//        if ("User canceled".equalsIgnoreCase(status) ||"Unhandled status.".equalsIgnoreCase(status) ) {
+//            response.put("message", "Payment canceled by user.");
+//            return ResponseEntity.ok(response);
+//        }
+//
+//        if ("Completed".equalsIgnoreCase(status)) {
+//            //verifying pidx
+//            if(pidx != null && !pidx.isEmpty()){
+//                Map<String , Object> verificationResponse = paymentService.verifyKhaltiPayment(pidx );
+//            }else {
+//                return ResponseEntity.badRequest().body("Payment was cancelled or invalid.");
+//            }
+//
+//            // Save to DB, update order status, etc.
+//            response.put("transaction_id", transactionId);
+//            response.put("message", "Payment successful.");
+//
+//            return ResponseEntity.ok(response);
+//        }
+//        response.put("message", "Unhandled status.");
+//        return ResponseEntity.badRequest().body(response);
+//
+//}
 
+    @PostMapping("/khalti/check-status")
+    public ResponseEntity<?> checkKhaltiPaymentStatus(@RequestBody KhaltiCheckStatusRequest request) {
+        String pidx = request.getPidx();
+        String token = request.getToken();
 
-        String status = params.get("status");
-        String pidx = params.get("pidx");
-        String amountStr = params.getOrDefault("amount", params.get("total_amount"));
-        String transactionId = params.get("transaction_id");
-        String purchaseOrderId = params.get("purchase_order_id");
-        String purchaseOrderName = params.get("purchase_order_name");
+        log.info("Received Khalti status check request for pidx: {}", pidx);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("pidx", pidx);
-        response.put("status", status);
-        response.put("amount", amountStr);
-        response.put("purchase_order_id", purchaseOrderId);
-        response.put("purchase_order_name", purchaseOrderName);
-
-        if ("User canceled".equalsIgnoreCase(status) ||"Unhandled status.".equalsIgnoreCase(status) ) {
-            response.put("message", "Payment canceled by user.");
-            return ResponseEntity.ok(response);
+        // Basic input validation
+        if (pidx == null || pidx.isBlank()) {
+            log.warn("Status check request missing pidx.");
+            return ResponseEntity.badRequest().body(Map.of("message", "Missing pidx for status check."));
         }
 
-        if ("Completed".equalsIgnoreCase(status)) {
-            //verifying pidx
-            if(pidx != null && !pidx.isEmpty()){
-                Map<String , Object> verificationResponse = paymentService.verifyKhaltiPayment(pidx);
-            }else {
-                return ResponseEntity.badRequest().body("Payment was cancelled or invalid.");
-            }
+        try {
+            // --- Call the service method that verifies with Khalti server-side ---
+            // This uses your secret key.
+            Map<String, Object> verificationResponse = paymentService.verifyKhaltiPayment(pidx , token);
 
-            // Save to DB, update order status, etc.
-            response.put("transaction_id", transactionId);
-            response.put("message", "Payment successful.");
+            // --- Return Khalti's verification response directly to the frontend ---
+            // The frontend will inspect the 'status', 'total_amount' etc. from this response
+            log.info("Returning Khalti verification status for pidx {}: {}", pidx, verificationResponse.get("status"));
+            return ResponseEntity.ok(verificationResponse);
 
-            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            // Catch errors from the paymentService call (e.g., communication failure with Khalti)
+            log.error("Khalti status check failed for pidx {} due to runtime exception: {}", pidx, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to verify Khalti payment status due to an internal error.", "pidx", pidx));
+        } catch (Exception e) {
+            // Catch any other unexpected errors
+            log.error("Unexpected error during Khalti status check for pidx {}: {}", pidx, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "An unexpected error occurred while checking payment status.", "pidx", pidx));
         }
-        response.put("message", "Unhandled status.");
-        return ResponseEntity.badRequest().body(response);
-
+    }
 }
 
-
-
-}
