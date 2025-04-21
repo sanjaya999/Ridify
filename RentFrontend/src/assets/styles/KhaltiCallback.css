@@ -1,0 +1,133 @@
+/* KhaltiCallback.css - styled to match dark, modern project theme */
+
+.khalti-callback-container {
+  background: linear-gradient(135deg, #232526 0%, #414345 100%);
+  color: #e0e0e0;
+  padding: 2.5rem 1.5rem 2.5rem 1.5rem;
+  border-radius: 18px;
+  max-width: 380px;
+  margin: 2.5rem auto 0 auto;
+  box-shadow: 0 6px 32px 0 rgba(0,0,0,0.18), 0 1.5px 3.5px 0 rgba(0,0,0,0.15);
+  border: 1.5px solid #333a40;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+}
+
+.khalti-callback-container h3 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  color: #fff;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #35393e;
+  padding-bottom: 0.7rem;
+}
+
+.khalti-status {
+  display: block;
+  text-align: center;
+  font-size: 1.13em;
+  font-weight: 600;
+  margin-top: 0.5em;
+  margin-bottom: 0.2em;
+  letter-spacing: 0.5px;
+}
+.khalti-status.success {
+  color: #6ee7b7;
+}
+.khalti-status.cancelled {
+  color: #ffe066;
+}
+.khalti-status.error {
+  color: #ff6b6b;
+}
+
+.khalti-callback-message {
+  text-align: center;
+  font-size: 1em;
+  color: #b5bac4;
+  margin-bottom: 1.2em;
+  min-height: 1.2em;
+}
+
+.khalti-callback-details {
+  margin: 1.5em 0 0 0;
+  padding: 1.2em 1.1em 1.1em 1.1em;
+  background: rgba(36,38,41,0.90);
+  border-radius: 10px;
+  border: 1px solid #32363b;
+  color: #e0e0e0;
+}
+.khalti-callback-details h4 {
+  margin: 0 0 0.7em 0;
+  color: #b5bac4;
+  font-size: 1.07em;
+  font-weight: 600;
+}
+.khalti-callback-details p {
+  margin: 0.3em 0;
+  color: #e0e0e0;
+  font-size: 0.98em;
+}
+
+.khalti-callback-actions {
+  margin-top: 2em;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.khalti-callback-actions .view-bookings-btn {
+  background: #fff;
+  color: #232526;
+  padding: 0.7em 1.5em;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1em;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.07);
+  transition: background 0.18s, color 0.18s, border 0.18s;
+}
+.khalti-go-home-btn {
+  background: #fff;
+  color: #232526;
+  padding: 0.2em 0.7em;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 3px;
+  font-weight: 400;
+  font-size: 0.88em;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.06);
+  transition: background 0.18s, color 0.18s, border 0.18s;
+  margin-left: 4px;
+  min-width: unset;
+  width: auto !important;
+  max-width: 110px;
+  display: inline-block;
+  text-align: center;
+  line-height: 1.2;
+}
+.khalti-go-home-btn:hover {
+  background: #232526;
+  color: #fff;
+  border: 1.5px solid #fff;
+}
+.khalti-callback-actions .view-bookings-btn:hover,
+.khalti-callback-actions a:hover {
+  background: #232526;
+  color: #fff;
+  border: 1.5px solid #fff;
+}
+
+@media (max-width: 600px) {
+  .khalti-callback-container {
+    padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+    max-width: 98vw;
+  }
+  .khalti-callback-details {
+    padding: 0.8em 0.5em 0.7em 0.5em;
+  }
+}
