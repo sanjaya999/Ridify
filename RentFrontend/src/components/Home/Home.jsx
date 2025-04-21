@@ -1,9 +1,11 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { get } from '../../api/api';
 import '../../assets/styles/Home.css';
 
 const Home = () => {
+  const navigate = useNavigate();
   const fetchVehicles = async () => {
     const { data } = await get(`vehicles/getAll`);
     return data;
@@ -42,7 +44,7 @@ const Home = () => {
             <h3>{vehicle.name}</h3>
             <p>{vehicle.description}</p>
             <p>Price: ${vehicle.price}/day</p>
-            <button>Book Now</button>
+            <button onClick={() => navigate(`/aboutVehicle/${vehicle.id}`)}>Book Now</button>
           </div>
         ))}
       </div>
