@@ -3,9 +3,13 @@ package com.renting.RentThis.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.renting.RentThis.entity.Transaction;
 import com.renting.RentThis.entity.User;
+import com.renting.RentThis.entity.Vehicle;
 import com.renting.RentThis.exception.InsufficientBalanceException;
 import com.renting.RentThis.repository.TransactionRepository;
 import com.renting.RentThis.repository.UserRepository;
+import com.renting.RentThis.repository.VehicleRepository;
+import io.jsonwebtoken.Claims;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,9 @@ public class PaymentService {
     private static final Logger log =  LoggerFactory.getLogger(PaymentService.class);
 
     @Autowired
+    private VehicleRepository vehicleRepository;
+
+    @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
     private UserRepository userRepository;
@@ -34,10 +41,16 @@ public class PaymentService {
     @Value("${khaltiSecretKey}")
     private String khaltiSecretKey;
 
+    @Autowired
+    private JwtService jwtService;
+
     private String khaltiApiUrl = "https://dev.khalti.com/api/v2";
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private UserService userService;
+
 
     @Transactional
     public void processInternalPayment(User payer , User reciever , BigDecimal amount , String bookingReference){
@@ -116,8 +129,23 @@ public class PaymentService {
 
 
 
-    public  Map<String , Object> verifyKhaltiPayment(String pidx){
+    public  Map<String , Object> verifyKhaltiPayment(String pidx , String token){
         log.info("Verifying Khalti payment with pidx: {}", pidx);
+        Claims claims = jwtService.extractBookingVerificationClaims(token);
+
+        Long userId = Long.parseLong(claims.get("userId").toString());
+        Long vehicleId = Long.parseLong(claims.get("vehicleId").toString());
+        LocalDateTime startTime = LocalDateTime.parse(claims.get("startTime").toString());
+        LocalDateTime endTime = LocalDateTime.parse(claims.get("endTime").toString());
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        User currentUser = userService.getCurrentUser();
+        if(!userId.equals(currentUser.getId())){
+            throw new RuntimeException("you are not the user ");
+        }
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new EntityNotFoundException("Vehicle not found"));
 
         try{
             HttpHeaders headers = new HttpHeaders();
@@ -134,6 +162,7 @@ public class PaymentService {
                     entity,
                     Map.class
             );
+
 
             log.info("Khalti payment verification result for pidx {}: status={}",
                     pidx, response.get("status"));
