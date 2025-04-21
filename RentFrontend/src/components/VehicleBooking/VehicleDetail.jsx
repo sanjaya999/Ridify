@@ -3,8 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import '../../assets/styles/VehicleDetail.css';
 
-// --- API functions ---
+// API functions
 import { get, post } from '../../api/api';
+
+const API_BASE_URL = 'http://localhost:8080';
 
 // Fetch single vehicle details
 const getVehicle = async (id) => {
@@ -16,8 +18,6 @@ const getVehicle = async (id) => {
   }
 };
 
-const API_BASE_URL = 'http://localhost:8080';
-
 // Verify booking availability
 const verifyBooking = async (bookingData) => {
   try {
@@ -28,19 +28,19 @@ const verifyBooking = async (bookingData) => {
   }
 };
 
-// --- Component ---
 const VehicleDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // State variables (remain the same)
-  const [startDateTime, setStartDateTime] = useState(''); // Stores "YYYY-MM-DDTHH:mm"
-  const [endDateTime, setEndDateTime] = useState('');   // Stores "YYYY-MM-DDTHH:mm"
+  // State variables
+  const [startDateTime, setStartDateTime] = useState('');
+  const [endDateTime, setEndDateTime] = useState('');
   const [isBooked, setIsBooked] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [duration, setDuration] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  // --- React Query Hooks (remain the same) ---
+  // React Query Hooks
   const { data, isLoading, error: queryError } = useQuery({
     queryKey: ['oneVehicle', id],
     queryFn: () => getVehicle(id),
@@ -50,9 +50,9 @@ const VehicleDetail = () => {
   const bookingMutation = useMutation({
     mutationFn: verifyBooking,
     onSuccess: (data) => {
-      // Handle API structure: { success, message, status, data: { token, hourlyRate, ... } }
-      if (data && data.success && data.data) {
+      if (data?.success && data?.data) {
         localStorage.setItem('bookingToken', data.data.token);
+        setErrorMessage('');
         navigate('/confirm-booking', {
           state: {
             hourlyRate: data.data.hourlyRate,
@@ -60,28 +60,22 @@ const VehicleDetail = () => {
             totalAmount: data.data.totalAmount
           }
         });
-      } else if (data && data.message) {
+      } else if (data?.message) {
         setIsBooked(false);
-        alert(data.message);
+        setErrorMessage(data.message);
       } else {
         setIsBooked(false);
-        alert('Unexpected response from server.');
+        setErrorMessage('Unexpected response from server.');
       }
     },
     onError: (error) => {
-      // Try to extract error message from API response
-      let errorMsg = 'Booking failed.';
-      if (error?.response?.data?.message) {
-        errorMsg = error.response.data.message;
-      } else if (error?.message) {
-        errorMsg = error.message;
-      }
-      alert(errorMsg);
+      const errorMsg = error?.response?.data?.message || error?.message || 'Booking failed.';
+      setErrorMessage(errorMsg);
       setIsBooked(false);
     }
   });
 
-  // --- Effects (remain the same) ---
+  // Calculate duration when dates change
   useEffect(() => {
     if (startDateTime && endDateTime) {
       const start = new Date(startDateTime);
@@ -96,19 +90,23 @@ const VehicleDetail = () => {
     } else {
       setDuration(0);
     }
+    
+    // Clear error messages when date/time changes
+    setErrorMessage('');
   }, [startDateTime, endDateTime]);
 
-  // --- Helper Functions (remain the same) ---
+  // Helper Functions
   const formatDateTime = (dateString) => {
-    // This function is for DISPLAY only, still correct for 24h format
     if (!dateString) return '';
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return 'Invalid Date';
+    
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
+    
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
 
@@ -117,9 +115,10 @@ const VehicleDetail = () => {
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     return now.toISOString().slice(0, 16);
   };
+  
   const minDateTime = getMinDateTime();
 
-  // --- Event Handlers (remain the same, except handleBooking) ---
+  // Event Handlers
   const handleStartDateChange = (value) => {
     setStartDateTime(value);
     if (value) {
@@ -137,40 +136,27 @@ const VehicleDetail = () => {
   };
 
   const handleEndDateChange = (value) => {
-    if (startDateTime && value) {
-      const start = new Date(startDateTime);
-      const end = new Date(value);
-      if (!isNaN(start.getTime()) && !isNaN(end.getTime()) && end > start) {
-        setEndDateTime(value);
-      } else {
-         setEndDateTime(value);
-      }
-    } else {
-      setEndDateTime(value);
-    }
+    setEndDateTime(value);
   };
 
   const handleShowBooking = () => {
     setShowDatePicker(true);
     const nowValue = getMinDateTime();
     setStartDateTime(nowValue);
+    
     const start = new Date(nowValue);
-     if (!isNaN(start.getTime())) {
-        const end = new Date(start.getTime() + 60 * 60 * 1000);
-        end.setMinutes(end.getMinutes() - end.getTimezoneOffset());
-        setEndDateTime(end.toISOString().slice(0, 16));
-      }
+    if (!isNaN(start.getTime())) {
+      const end = new Date(start.getTime() + 60 * 60 * 1000);
+      end.setMinutes(end.getMinutes() - end.getTimezoneOffset());
+      setEndDateTime(end.toISOString().slice(0, 16));
+    }
   };
 
-  // --- *** MODIFIED handleBooking function *** ---
   const handleBooking = () => {
-     if (!startDateTime || !endDateTime || duration <= 0) {
-       alert('Please select a valid start and end time.');
-       return;
-     }
-
-    // The state variables (startDateTime, endDateTime) hold "YYYY-MM-DDTHH:mm" (local time)
-    // Simply append ":00" to match the backend requirement "YYYY-MM-DDTHH:mm:ss"
+    if (!startDateTime || !endDateTime || duration <= 0) {
+      setErrorMessage('Please select a valid start and end time.');
+      return;
+    }
 
     const formattedStartTime = `${startDateTime}:00`;
     const formattedEndTime = `${endDateTime}:00`;
@@ -181,13 +167,33 @@ const VehicleDetail = () => {
       endTime: formattedEndTime
     };
 
-    // Send booking verification request
     bookingMutation.mutate(bookingData);
   };
-  // --- *** End of modification ***
 
+  // Parse and format alternative availability times
+  const formatAvailabilityMessage = (message) => {
+    if (!message || !message.includes('Nearby availability:')) return message;
+    
+    const [errorPart, availabilityPart] = message.split('Nearby availability:');
+    
+    if (!availabilityPart) return message;
+    
+    const availabilitySlots = availabilityPart.trim().split(',').map(slot => slot.trim());
+    
+    return (
+      <div>
+        <p>{errorPart.trim()}</p>
+        <p><strong>Nearby availability:</strong></p>
+        <ul className="availability-slots">
+          {availabilitySlots.map((slot, index) => (
+            <li key={index}>{slot}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
 
-  // --- Render Logic (remain the same) ---
+  // Render Logic
   if (isLoading) return <p>Loading vehicle details...</p>;
   if (queryError) return <p>Error loading vehicle: {queryError.message}</p>;
   if (!data || !data.data) return <p>Vehicle not found.</p>;
@@ -256,18 +262,25 @@ const VehicleDetail = () => {
                 </div>
               </div>
 
-              {/* Display selected times formatted in 24h (for user feedback) */}
+              {/* Display selected times */}
               {startDateTime && endDateTime && (
-                <div className="selected-time-details" style={{ marginTop: '10px', fontSize: '0.9em' }}>
-                   <p>Selected: {formatDateTime(startDateTime)} to {formatDateTime(endDateTime)}</p>
-                   {duration > 0 ? (
-                     <p>Duration: {duration} hour(s)</p>
-                   ) : (
-                     <p style={{ color: 'orange' }}>Duration: End time must be after start time.</p>
-                   )}
+                <div className="selected-time-details">
+                  <p>Selected: {formatDateTime(startDateTime)} to {formatDateTime(endDateTime)}</p>
+                  {duration > 0 ? (
+                    <p>Duration: {duration} hour(s)</p>
+                  ) : (
+                    <p className="warning-text">Duration: End time must be after start time.</p>
+                  )}
                 </div>
               )}
             </div>
+
+            {/* Error Message Display */}
+            {errorMessage && (
+              <div className="availability-error">
+                {formatAvailabilityMessage(errorMessage)}
+              </div>
+            )}
 
             {/* Booking Button */}
             <button
@@ -278,31 +291,19 @@ const VehicleDetail = () => {
               {bookingMutation.isPending ? 'Processing...' : (isBooked ? 'Booked!' : 'Confirm Booking')}
             </button>
 
-            {/* Booking Confirmation Message (uses display format) */}
+            {/* Booking Confirmation Message */}
             {isBooked && (
               <p className="booking-confirmation">
                 Your booking has been confirmed from {formatDateTime(startDateTime)} to {formatDateTime(endDateTime)}
               </p>
             )}
 
-             {/* Display API errors */}
-            {bookingMutation.isError && (
-               <p className="error-message" style={{ color: 'red', marginTop: '10px' }}>
-                  Booking Error: {bookingMutation.error.message}
-               </p>
-            )}
-
-            {/* Debug section - Shows the format being sent */}
-            <div style={{
-              marginTop: '20px', padding: '10px', backgroundColor: '#1a1a1a',
-              borderRadius: '4px', fontSize: '12px', color: '#90caf9', wordBreak: 'break-all',
-              border: '1px solid rgba(255, 255, 255, 0.1)', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
-            }}>
+            {/* Debug section */}
+            <div className="debug-info">
               <p>Debug Info (Format Sent to Backend):</p>
-              <pre style={{ whiteSpace: 'pre-wrap', fontSize: '11px', color: '#e0e0e0' }}>
+              <pre>
                 {JSON.stringify({
                   vehicleId: id ? parseInt(id, 10) : null,
-                  // Show the actual strings being sent in the required format
                   startTimeToSend: startDateTime ? `${startDateTime}:00` : null,
                   endTimeToSend: endDateTime ? `${endDateTime}:00` : null,
                   currentState: { startDateTime, endDateTime, duration, isBooked }
