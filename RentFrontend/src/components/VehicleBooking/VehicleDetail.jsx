@@ -55,9 +55,16 @@ const VehicleDetail = () => {
         setErrorMessage('');
         navigate('/confirm-booking', {
           state: {
+            // Existing data from backend verification
             hourlyRate: data.data.hourlyRate,
             totalHours: data.data.totalHours,
-            totalAmount: data.data.totalAmount
+            totalAmount: data.data.totalAmount,
+            // === Add Vehicle details from the initial fetch ===
+            vehicleId: vehicle.id, // Pass ID if needed for Khalti metadata
+            vehicleName: vehicle.name,
+            vehicleModel: vehicle.model,
+            vehiclePhotoUrl: vehicle.photoUrl
+            // =================================================
           }
         });
       } else if (data?.message) {
