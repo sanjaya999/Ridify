@@ -45,13 +45,18 @@ public class IntervalSchedulingService {
                                                LocalDateTime requestedEnd) {
         List<TimeSlot> overlaps = new ArrayList<>();
         for (Booking booking : existingBookings) {
-            if (!(requestedEnd.isBefore(booking.getStartTime()) ||
-                    requestedStart.isAfter(booking.getEndTime()))) {
+            // --- CORRECTED Condition ---
+            // Overlap exists if request starts BEFORE booking ends
+            // AND request ends AFTER booking starts.
+            if (requestedStart.isBefore(booking.getEndTime()) &&
+                    requestedEnd.isAfter(booking.getStartTime())) {
+                // Add the existing booking's timeslot to indicate what is conflicting
                 overlaps.add(new TimeSlot(booking.getStartTime(), booking.getEndTime()));
             }
         }
         return overlaps;
     }
+
 
 
     /**
