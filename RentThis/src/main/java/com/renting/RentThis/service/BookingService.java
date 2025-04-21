@@ -265,7 +265,7 @@ public class BookingService {
     }
 
 
-    private BigDecimal calculateAmount(Vehicle vehicle, LocalDateTime start, LocalDateTime end) {
+    public BigDecimal calculateAmount(Vehicle vehicle, LocalDateTime start, LocalDateTime end) {
         long hours = Duration.between(start, end).toHours();
         if (hours == 0) hours = 1; // Minimum 1 hour
         return vehicle.getPrice().multiply(BigDecimal.valueOf(hours));
