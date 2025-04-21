@@ -9,6 +9,8 @@ import Bookings from './components/Bookings/Bookings';
 import './App.css';
 import VehicleDetail from "./components/VehicleBooking/VehicleDetail.jsx";
 import ConfirmBooking from "./components/VehicleBooking/ConfirmBooking.jsx";
+import BookingDetails from "./components/VehicleBooking/BookingDetails.jsx";
+import KhaltiCallback from "./components/VehicleBooking/KhaltiCallback.jsx";
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
           <Route path="contact" element={<div>Contact Page</div>} />
           <Route path="/aboutVehicle/:id" element={<VehicleDetail />} />
           <Route path="/confirm-booking" element={<ConfirmBooking />} />
+          <Route path="/booking-details" element={<BookingDetailsWrapper />} />
+          <Route path="/khalti-callback" element={<KhaltiCallback />} />
 
           <Route element={<PrivateRoute />}>
             <Route path="vehicles" element={<div>Vehicles Page</div>} />
@@ -36,6 +40,23 @@ function App() {
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
     </Router>
+  );
+}
+
+// Wrapper to pass location.state as props to BookingDetails
+import { useLocation, useNavigate } from 'react-router-dom';
+function BookingDetailsWrapper() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  return (
+    <BookingDetails
+      bookingInfo={location.state?.bookingInfo}
+      paymentMethod={location.state?.paymentMethod}
+      totalAmount={location.state?.totalAmount}
+      vehicleName={location.state?.vehicleName}
+      vehicleModel={location.state?.vehicleModel}
+      navigate={navigate}
+    />
   );
 }
 
