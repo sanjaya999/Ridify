@@ -11,6 +11,8 @@ import VehicleDetail from "./components/VehicleBooking/VehicleDetail.jsx";
 import ConfirmBooking from "./components/VehicleBooking/ConfirmBooking.jsx";
 import BookingDetails from "./components/VehicleBooking/BookingDetails.jsx";
 import KhaltiCallback from "./components/VehicleBooking/KhaltiCallback.jsx";
+import Upload from './pages/Upload';
+import AllVehicles from './pages/AllVehicles';
 
 function App() {
   return (
@@ -29,7 +31,12 @@ function App() {
           <Route path="/confirm-booking" element={<ConfirmBooking />} />
           <Route path="/booking-details" element={<BookingDetailsWrapper />} />
           <Route path="/khalti-callback" element={<KhaltiCallback />} />
-
+          <Route path="upload" element={
+            localStorage.getItem('role') === 'admin' ? <Upload /> : <div style={{padding:'2rem',textAlign:'center'}}>You are not authorized to view this page.</div>
+          } />
+          <Route path="all-vehicles" element={
+            localStorage.getItem('role') === 'admin' ? <AllVehicles /> : <div style={{padding:'2rem',textAlign:'center'}}>You are not authorized to view this page.</div>
+          } />
           <Route element={<PrivateRoute />}>
             <Route path="vehicles" element={<div>Vehicles Page</div>} />
             <Route path="profile" element={<div>Profile Page</div>} />
