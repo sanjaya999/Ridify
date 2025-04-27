@@ -6,11 +6,14 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import '../../assets/styles/Layout.css';
 
-const Navbar = () => {
+
+const Navbar = ({ walletBalance, refreshWalletBalance }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userId, setUserId] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
@@ -22,7 +25,14 @@ const Navbar = () => {
     if (storedUserId) {
       setUserId(storedUserId);
     }
+    const role = localStorage.getItem('role');
+    setIsAdmin(role === 'admin');
+    if (token && typeof refreshWalletBalance === 'function') {
+      refreshWalletBalance();
+    }
   }, []);
+
+
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -56,7 +66,9 @@ const Navbar = () => {
 
   const menuItems = [
     { text: 'Home', path: '/' },
+    ...(isAdmin ? [{ text: 'Upload', path: '/upload' }] : []),
     { text: 'Vehicles', path: '/vehicles' },
+    ...(isAdmin ? [{ text: 'All Vehicles', path: '/all-vehicles' }] : []),
     { text: 'About', path: '/about' },
     { text: 'Contact', path: '/contact' },
   ];
@@ -122,6 +134,9 @@ const Navbar = () => {
 
   const authButtons = isAuthenticated ? (
     <div className="profile-section">
+      <div className="wallet-balance" style={{ marginRight: 16, fontWeight: 500 }}>
+        Wallet: NPR {walletBalance !== null ? walletBalance : '--'}
+      </div>
       <IconButton
         aria-label="account of current user"
         aria-controls="menu-appbar"
