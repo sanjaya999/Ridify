@@ -13,6 +13,7 @@ import BookingDetails from "./components/VehicleBooking/BookingDetails.jsx";
 import KhaltiCallback from "./components/VehicleBooking/KhaltiCallback.jsx";
 import Upload from './pages/Upload';
 import AllVehicles from './pages/AllVehicles';
+import BrowseVehicles from './pages/BrowseVehicles';
 
 function App() {
   return (
@@ -37,8 +38,8 @@ function App() {
           <Route path="all-vehicles" element={
             localStorage.getItem('role') === 'admin' ? <AllVehicles /> : <div style={{padding:'2rem',textAlign:'center'}}>You are not authorized to view this page.</div>
           } />
+          <Route path="vehicles" element={<BrowseVehicles />} />
           <Route element={<PrivateRoute />}>
-            <Route path="vehicles" element={<div>Vehicles Page</div>} />
             <Route path="profile" element={<div>Profile Page</div>} />
             <Route path="bookings" element={<Bookings />} />
           </Route>
