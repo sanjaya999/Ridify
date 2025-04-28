@@ -3,12 +3,15 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../../assets/styles/ConfirmBooking.css';
 import { post } from '../../api/api';
+import { useOutletContext } from 'react-router-dom';
 
 // Define your API base URL (needed for image path construction)
 // Adjust if your environment setup differs
 const API_BASE_URL =  'http://localhost:8080';
 
 const ConfirmBooking = () => {
+  const { refreshWalletBalance } = useOutletContext() || {};
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -119,6 +122,9 @@ const ConfirmBooking = () => {
                 // SUCCESS: Booking confirmed by the backend
                 setFeedback(''); // Clear any processing feedback
                 // Instead of rendering here, navigate to the booking details page with all info
+                if (typeof refreshWalletBalance === 'function') {
+                  refreshWalletBalance();
+                }
                 navigate('/booking-details', {
                   state: {
                     bookingInfo: response,
