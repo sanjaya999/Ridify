@@ -25,6 +25,8 @@ public class Booking {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
+    private String paymentMethod;
+
     private String status;
 
 }
