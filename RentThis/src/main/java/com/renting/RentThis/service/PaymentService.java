@@ -1,10 +1,13 @@
 package com.renting.RentThis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.renting.RentThis.dto.response.TransactionResponse;
+import com.renting.RentThis.entity.Booking;
 import com.renting.RentThis.entity.Transaction;
 import com.renting.RentThis.entity.User;
 import com.renting.RentThis.entity.Vehicle;
 import com.renting.RentThis.exception.InsufficientBalanceException;
+import com.renting.RentThis.repository.BookingRespository;
 import com.renting.RentThis.repository.TransactionRepository;
 import com.renting.RentThis.repository.UserRepository;
 import com.renting.RentThis.repository.VehicleRepository;
@@ -20,11 +23,13 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.View;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class PaymentService {
@@ -38,6 +43,9 @@ public class PaymentService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private BookingRespository bookingRespository;
+
     @Value("${khaltiSecretKey}")
     private String khaltiSecretKey;
 
@@ -50,6 +58,8 @@ public class PaymentService {
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private UserService userService;
+    @Autowired
+    private View error;
 
 
     @Transactional
@@ -166,6 +176,15 @@ public class PaymentService {
 
             log.info("Khalti payment verification result for pidx {}: status={}",
                     pidx, response.get("status"));
+            Booking booking = new Booking();
+            booking.setUser(user);
+            booking.setVehicle(vehicle);
+            booking.setStartTime(startTime);
+            booking.setEndTime(endTime);
+            booking.setStatus("Confirmed");
+            booking.setPaymentMethod("Khalti");
+
+            Booking saveBooking = bookingRespository.save(booking);
 
             return response;
 
@@ -193,6 +212,127 @@ public class PaymentService {
 
         transactionRepository.save(transaction);
         log.info("Transaction record created: {}", transaction.getId());
+    }
+
+
+    public TransactionResponse khaltiTopup(String pidx) {
+        log.info("Verifying Khalti payment with pidx: {}", pidx);
+
+        User currentUser = userService.getCurrentUser();
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", "Key " + khaltiSecretKey);
+
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("pidx", pidx);
+
+            HttpEntity<Map<String, String>> entity = new HttpEntity<>(requestBody, headers);
+
+            Map<String, Object> response = restTemplate.postForObject(
+                    khaltiApiUrl + "/epayment/lookup/",
+                    entity,
+                    Map.class
+            );
+
+            if (response == null) {
+                log.error("Received null response from Khalti verification API for pidx: {}", pidx);
+                return TransactionResponse.builder()
+                        .message("Failed to verify payment: Null response from payment gateway")
+                        .paymentMethod("khalti")
+                        .status("failed")
+                        .build();
+            }
+
+            String khaltiStatus = (String) response.get("status");
+            log.info("Khalti payment verification result for pidx {}: status={}", pidx, khaltiStatus);
+
+            // Only process completed payments
+            if (khaltiStatus.equals("Completed")) {
+                BigDecimal amount = new BigDecimal(response.get("total_amount").toString());
+                BigDecimal amountToAdd = amount.divide(new BigDecimal(100));
+
+                BigDecimal userBalance = currentUser.getBalance();
+                BigDecimal newBalance = userBalance.add(amountToAdd);
+                currentUser.setBalance(newBalance);
+                userRepository.save(currentUser);
+
+                return TransactionResponse.builder()
+                        .message("Payment verified and balance updated successfully")
+                        .paymentMethod("khalti")
+                        .status("success")
+                        .build();
+            } else {
+                // Handle non-completed status
+                log.warn("Khalti payment not completed for pidx {}: status={}", pidx, khaltiStatus);
+                return TransactionResponse.builder()
+                        .message("Payment verification failed: Status is " + khaltiStatus)
+                        .paymentMethod("khalti")
+                        .status("failed")
+                        .build();
+            }
+
+        } catch (Exception e) {
+            log.error("Failed to verify Khalti payment: {}", e.getMessage(), e);
+            return TransactionResponse.builder()
+                    .message("Failed to verify payment: " + e.getMessage())
+                    .paymentMethod("khalti")
+                    .status("error")
+                    .build();
+        }
+    }
+
+    public Map<String , Object> topupKhalti(
+            BigDecimal amount,
+            String orderId,
+            String productName,
+            String customerName,
+            String customerEmail,
+            String customerPhone,
+            String returnUrl
+
+    ){
+        log.info("Initiating khalti Payment for order:{} , amount: {}" , orderId , amount);
+
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization" , "Key " + khaltiSecretKey);
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("return_url", returnUrl);
+            requestBody.put("website_url" , returnUrl);
+            System.out.println("amount" + amount);
+            requestBody.put("amount" , amount);
+            requestBody.put("purchase_order_id" , orderId);
+            requestBody.put("purchase_order_name" , productName);
+
+
+            Map<String , Object> customerInfo = new HashMap<>();
+            customerInfo.put("name" , customerName);
+            customerInfo.put("email" , customerEmail);
+            customerInfo.put("phone" , customerPhone);
+            requestBody.put("customer_info" , customerInfo);
+
+            HttpEntity<Map<String , Object>> entity = new HttpEntity<>(requestBody , headers);
+
+            Map<String, Object> response = restTemplate.postForObject(
+                    khaltiApiUrl + "/epayment/initiate/",
+                    entity,
+                    Map.class
+            );
+
+            log.info("Khalti payment initiated successfully with pidx: {}", response.get("pidx"));
+
+
+            return response;
+
+
+        } catch (Exception e) {
+            log.error("Failed to initiate Khalti payment: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to initiate payment: " + e.getMessage(), e);
+        }
     }
 }
 
