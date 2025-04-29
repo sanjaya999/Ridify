@@ -11,11 +11,37 @@ import VehicleDetail from "./components/VehicleBooking/VehicleDetail.jsx";
 import ConfirmBooking from "./components/VehicleBooking/ConfirmBooking.jsx";
 import BookingDetails from "./components/VehicleBooking/BookingDetails.jsx";
 import KhaltiCallback from "./components/VehicleBooking/KhaltiCallback.jsx";
+import TopUp from "./components/Wallet/TopUp.jsx";
+import TopUpCallback from "./components/Wallet/TopUpCallback.jsx";
 import Upload from './pages/Upload';
 import AllVehicles from './pages/AllVehicles';
 import BrowseVehicles from './pages/BrowseVehicles';
+import React, { useState, useEffect } from 'react';
 
 function App() {
+  const [isAdmin, setIsAdmin] = useState(false);
+  
+  useEffect(() => {
+    // Check if user is admin
+    const checkAdminStatus = () => {
+      const role = localStorage.getItem('role');
+      setIsAdmin(role === 'admin');
+    };
+    
+    // Check immediately when component mounts
+    checkAdminStatus();
+    
+    // Also set up event listeners for storage changes and custom roleChange event
+    window.addEventListener('storage', checkAdminStatus);
+    window.addEventListener('roleChange', checkAdminStatus);
+    
+    // Clean up event listeners
+    return () => {
+      window.removeEventListener('storage', checkAdminStatus);
+      window.removeEventListener('roleChange', checkAdminStatus);
+    };
+  }, []);
+
   return (
     <Router>
       <Routes>
@@ -32,11 +58,13 @@ function App() {
           <Route path="/confirm-booking" element={<ConfirmBooking />} />
           <Route path="/booking-details" element={<BookingDetailsWrapper />} />
           <Route path="/khalti-callback" element={<KhaltiCallback />} />
+          <Route path="/topup" element={<TopUp />} />
+          <Route path="/topup-callback" element={<TopUpCallback />} />
           <Route path="upload" element={
-            localStorage.getItem('role') === 'admin' ? <Upload /> : <div style={{padding:'2rem',textAlign:'center'}}>You are not authorized to view this page.</div>
+            isAdmin ? <Upload /> : <div style={{padding:'2rem',textAlign:'center'}}>You are not authorized to view this page.</div>
           } />
           <Route path="all-vehicles" element={
-            localStorage.getItem('role') === 'admin' ? <AllVehicles /> : <div style={{padding:'2rem',textAlign:'center'}}>You are not authorized to view this page.</div>
+            isAdmin ? <AllVehicles /> : <div style={{padding:'2rem',textAlign:'center'}}>You are not authorized to view this page.</div>
           } />
           <Route path="vehicles" element={<BrowseVehicles />} />
           <Route element={<PrivateRoute />}>
