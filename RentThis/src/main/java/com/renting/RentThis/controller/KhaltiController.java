@@ -3,6 +3,8 @@ package com.renting.RentThis.controller;
 import com.renting.RentThis.dto.request.BookingConfirmRequest;
 import com.renting.RentThis.dto.request.BookingRequest;
 import com.renting.RentThis.dto.request.KhaltiCheckStatusRequest;
+import com.renting.RentThis.dto.request.TopupRequest;
+import com.renting.RentThis.dto.response.TransactionResponse;
 import com.renting.RentThis.entity.User;
 import com.renting.RentThis.entity.Vehicle;
 import com.renting.RentThis.repository.VehicleRepository;
@@ -84,6 +86,26 @@ public class KhaltiController {
         return ResponseEntity.ok(response);
 
     }
+
+    @PostMapping("/khalti/topup")
+    public ResponseEntity<?> topupKhalti(@RequestBody TopupRequest request) {
+
+        User currentUser = userService.getCurrentUser();
+
+        BigDecimal amountToTopup = request.getAmount().multiply(new BigDecimal("100"));
+
+        String topupid = "top" + currentUser.getId() + "-" + amountToTopup;
+
+        String returnUrl = "http://localhost:5173/topup-callback";
+        String customerName = currentUser.getName();
+        String customerEmail = currentUser.getEmail();
+        String cusotmerPhone = "1234567891";
+        System.out.println("amount in controller " + amountToTopup);
+
+        Map<String, Object> response = paymentService.topupKhalti(amountToTopup ,topupid,"topup" , customerName, customerEmail, cusotmerPhone, returnUrl );
+        return ResponseEntity.ok(response);
+
+    }
 //    @GetMapping("/khaltiCall/callback")
 //    public ResponseEntity<?> handleKhaltiCallback(@RequestParam Map<String, String> params) {
 //
@@ -161,5 +183,42 @@ public class KhaltiController {
                     .body(Map.of("message", "An unexpected error occurred while checking payment status.", "pidx", pidx));
         }
     }
+
+    @PostMapping("/khalti/topup/check-status")
+    public ResponseEntity<?> topupPaymentStatus(@RequestBody KhaltiCheckStatusRequest request) {
+        String pidx = request.getPidx();
+
+        log.info("Received Khalti status check request for pidx: {}", pidx);
+
+        // Basic input validation
+        if (pidx == null || pidx.isBlank()) {
+            log.warn("Status check request missing pidx.");
+            return ResponseEntity.badRequest().body(Map.of("message", "Missing pidx for status check."));
+        }
+
+        try {
+            // --- Call the service method that verifies with Khalti server-side ---
+            // This uses your secret key.
+            TransactionResponse verificationResponse = paymentService.khaltiTopup(pidx );
+
+            // --- Return Khalti's verification response directly to the frontend ---
+            // The frontend will inspect the 'status', 'total_amount' etc. from this response
+            return ResponseEntity.ok(verificationResponse);
+
+        } catch (RuntimeException e) {
+            // Catch errors from the paymentService call (e.g., communication failure with Khalti)
+            log.error("Khalti status check failed for pidx {} due to runtime exception: {}", pidx, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to verify Khalti payment status due to an internal error.", "pidx", pidx));
+        } catch (Exception e) {
+            // Catch any other unexpected errors
+            log.error("Unexpected error during Khalti status check for pidx {}: {}", pidx, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "An unexpected error occurred while checking payment status.", "pidx", pidx));
+        }
+    }
+
+
+
 }
 
