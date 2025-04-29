@@ -18,6 +18,7 @@ public class BookingResponse {
     private VehicleResponse vehicle;
     private UserResponse bookedUser;
     private String status;
+    private String paymentMethod;
 
 
 
