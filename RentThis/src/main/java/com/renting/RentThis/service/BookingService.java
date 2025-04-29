@@ -91,14 +91,16 @@ public class BookingService {
             );
         }
 
-        String currentUserEmail = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        User currentUser = userRepository.findByEmail(currentUserEmail)
-                .orElseThrow(()-> new RuntimeException("User not found with email "+ currentUserEmail));
-        BigDecimal balance = currentUser.getBalance();
-        BigDecimal vehiclePrice = vehicle.getPrice();
-        User vehicleOwner = vehicle.getOwner();
+
 
         try{
+            String currentUserEmail = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+            User currentUser = userRepository.findByEmail(currentUserEmail)
+                    .orElseThrow(()-> new RuntimeException("User not found with email "+ currentUserEmail));
+            BigDecimal balance = currentUser.getBalance();
+            BigDecimal vehiclePrice = vehicle.getPrice();
+            User vehicleOwner = vehicle.getOwner();
+
             paymentService.processInternalPayment(currentUser , vehicleOwner
             ,vehiclePrice , "Booking" + LocalDateTime.now());
             Booking booking = new Booking();
@@ -107,10 +109,12 @@ public class BookingService {
             booking.setStartTime(request.getStartTime());
             booking.setEndTime(request.getEndTime());
             booking.setStatus("Confirmed");
+            booking.setPaymentMethod("Internal");
 
             Booking saveBooking = bookingRespository.save(booking);
             return BookingResponse.builder()
                     .id(booking.getId())
+                    .paymentMethod(booking.getPaymentMethod())
                     .startDate(booking.getStartTime())
                     .endDate(booking.getEndTime())
                     .vehicle(ResponseMapper.toVehicleMap(saveBooking.getVehicle()))
@@ -138,6 +142,7 @@ public class BookingService {
                         .endDate(booking.getEndTime())
                         .vehicle(ResponseMapper.toVehicleMap(booking.getVehicle()))
                         .bookedUser(ResponseMapper.toUserMap(booking.getUser()))
+                        .paymentMethod(booking.getPaymentMethod())
                         .status(booking.getStatus())
                         .build())
                 .collect(Collectors.toList());
@@ -155,6 +160,7 @@ public class BookingService {
         return bookings.stream()
                 .map(booking -> BookingResponse.builder()
                         .id(booking.getId())
+                        .paymentMethod(booking.getPaymentMethod())
                         .startDate(booking.getStartTime())
                         .endDate(booking.getEndTime())
                         .bookedUser(ResponseMapper.toUserMap(booking.getUser()))
@@ -251,11 +257,13 @@ public class BookingService {
         booking.setStartTime(startTime);
         booking.setEndTime(endTime);
         booking.setStatus("Confirmed");
+        booking.setPaymentMethod("Internal");
 
         Booking saved = bookingRespository.save(booking);
 
         return BookingResponse.builder()
                 .id(saved.getId())
+                .paymentMethod(saved.getPaymentMethod())
                 .startDate(saved.getStartTime())
                 .endDate(saved.getEndTime())
                 .vehicle(ResponseMapper.toVehicleMap(saved.getVehicle()))
@@ -270,6 +278,7 @@ public class BookingService {
         if (hours == 0) hours = 1; // Minimum 1 hour
         return vehicle.getPrice().multiply(BigDecimal.valueOf(hours));
     }
+
 
 
 
