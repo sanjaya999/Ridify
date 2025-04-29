@@ -115,6 +115,15 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
           </ListItem>
           <ListItem
             button
+            component={NavLink}
+            to="/topup"
+            onClick={handleDrawerToggle}
+            className="drawer-link"
+          >
+            <ListItemText primary="Top Up Wallet" />
+          </ListItem>
+          <ListItem
+            button
             onClick={() => {
               localStorage.removeItem('accessToken');
               localStorage.removeItem('userId');
@@ -137,6 +146,23 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
       <div className="wallet-balance" style={{ marginRight: 16, fontWeight: 500 }}>
         Wallet: NPR {walletBalance !== null ? walletBalance : '--'}
       </div>
+      <Button
+        component={NavLink}
+        to="/topup"
+        variant="outlined"
+        size="small"
+        sx={{
+          marginRight: 2,
+          borderColor: '#8c52ff',
+          color: '#8c52ff',
+          '&:hover': {
+            borderColor: '#7440e0',
+            backgroundColor: 'rgba(140, 82, 255, 0.1)'
+          }
+        }}
+      >
+        Top Up
+      </Button>
       <IconButton
         aria-label="account of current user"
         aria-controls="menu-appbar"
@@ -162,6 +188,7 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
         onClose={handleProfileMenuClose}
       >
         <MenuItem onClick={handleViewBookings}>My Bookings</MenuItem>
+        <MenuItem onClick={() => { navigate('/topup'); handleProfileMenuClose(); }}>Top Up Wallet</MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </div>
