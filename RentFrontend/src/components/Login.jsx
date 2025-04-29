@@ -46,6 +46,10 @@ const Login = () => {
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('role', response.data.role);
         localStorage.setItem('refresh', response.data.refreshToken);
+        
+        // Dispatch a custom event to notify other components about the role change
+        window.dispatchEvent(new Event('roleChange'));
+        
         navigate('/');
       }
     } catch (err) {
