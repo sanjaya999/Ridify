@@ -229,6 +229,11 @@ const ConfirmBooking = () => {
                         onClick={() => handlePaymentSelection('Khalti')}
                         disabled={isProcessing}
                     >
+                        <img 
+                            src="/khalti-logo.png" 
+                            alt="Khalti" 
+                            style={{ height: '20px', marginRight: '8px', verticalAlign: 'middle' }} 
+                        />
                         Pay with Khalti
                     </button>
                 </div>
