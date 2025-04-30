@@ -13,6 +13,7 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
   const [userId, setUserId] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -27,6 +28,7 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
     }
     const role = localStorage.getItem('role');
     setIsAdmin(role === 'admin');
+    setIsSuperAdmin(role === 'superAdmin');
     if (token && typeof refreshWalletBalance === 'function') {
       refreshWalletBalance();
     }
@@ -69,6 +71,7 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
     ...(isAdmin ? [{ text: 'Upload', path: '/upload' }] : []),
     { text: 'Vehicles', path: '/vehicles' },
     ...(isAdmin ? [{ text: 'All Vehicles', path: '/all-vehicles' }] : []),
+    ...(isSuperAdmin ? [{ text: 'User Management', path: '/user-management' }] : []),
     { text: 'About', path: '/about' },
     { text: 'Contact', path: '/contact' },
   ];
@@ -189,6 +192,9 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
       >
         <MenuItem onClick={handleViewBookings}>My Bookings</MenuItem>
         <MenuItem onClick={() => { navigate('/topup'); handleProfileMenuClose(); }}>Top Up Wallet</MenuItem>
+        {isSuperAdmin && (
+          <MenuItem onClick={() => { navigate('/user-management'); handleProfileMenuClose(); }}>User Management</MenuItem>
+        )}
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
     </div>
