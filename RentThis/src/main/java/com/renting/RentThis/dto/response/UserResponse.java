@@ -10,5 +10,6 @@ public class UserResponse {
     private String name;
     private String email;
     private String message;
+    private boolean isSuspended;
 
 }
