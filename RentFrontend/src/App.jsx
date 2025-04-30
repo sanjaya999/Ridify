@@ -5,6 +5,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import PrivateRoute from './components/ProtectedRoutes/PrivateRoute';
 import PublicRoute from './components/ProtectedRoutes/PublicRoute';
+import SuperAdminRoute from './components/ProtectedRoutes/SuperAdminRoute';
 import Bookings from './components/Bookings/Bookings';
 import './App.css';
 import VehicleDetail from "./components/VehicleBooking/VehicleDetail.jsx";
@@ -16,29 +17,32 @@ import TopUpCallback from "./components/Wallet/TopUpCallback.jsx";
 import Upload from './pages/Upload';
 import AllVehicles from './pages/AllVehicles';
 import BrowseVehicles from './pages/BrowseVehicles';
+import UserManagement from './components/SuperAdmin/UserManagement';
 import React, { useState, useEffect } from 'react';
 
 function App() {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   
   useEffect(() => {
-    // Check if user is admin
-    const checkAdminStatus = () => {
+    // Check if user is admin or superadmin
+    const checkUserRoles = () => {
       const role = localStorage.getItem('role');
       setIsAdmin(role === 'admin');
+      setIsSuperAdmin(role === 'superAdmin');
     };
     
     // Check immediately when component mounts
-    checkAdminStatus();
+    checkUserRoles();
     
     // Also set up event listeners for storage changes and custom roleChange event
-    window.addEventListener('storage', checkAdminStatus);
-    window.addEventListener('roleChange', checkAdminStatus);
+    window.addEventListener('storage', checkUserRoles);
+    window.addEventListener('roleChange', checkUserRoles);
     
     // Clean up event listeners
     return () => {
-      window.removeEventListener('storage', checkAdminStatus);
-      window.removeEventListener('roleChange', checkAdminStatus);
+      window.removeEventListener('storage', checkUserRoles);
+      window.removeEventListener('roleChange', checkUserRoles);
     };
   }, []);
 
@@ -70,6 +74,11 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="profile" element={<div>Profile Page</div>} />
             <Route path="bookings" element={<Bookings />} />
+          </Route>
+          
+          {/* SuperAdmin Routes */}
+          <Route element={<SuperAdminRoute />}>
+            <Route path="user-management" element={<UserManagement />} />
           </Route>
         </Route>
 
