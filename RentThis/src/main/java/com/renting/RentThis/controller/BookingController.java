@@ -1,5 +1,6 @@
 package com.renting.RentThis.controller;
 
+import com.renting.RentThis.CustomAnnotation.CheckSuspention;
 import com.renting.RentThis.dto.request.BookingConfirmRequest;
 import com.renting.RentThis.dto.request.BookingRequest;
 import com.renting.RentThis.dto.response.ApiResponse;
@@ -23,6 +24,7 @@ public class BookingController {
 
     private final BookingService bookingService;
 
+    @CheckSuspention
     @PostMapping("/confirmBooking")
     public ResponseEntity<ApiResponse<BookingResponse>> bookVehicle(@RequestBody BookingRequest request) {
         System.out.println(request.getStartTime() + " end time : " + request.getEndTime());
@@ -35,6 +37,7 @@ public class BookingController {
                 .build());
     }
 
+    @CheckSuspention
     @GetMapping("/currentUserBooking")
     public ResponseEntity<ApiResponse<List<BookingResponse>>> currentUserBookings() {
         List<BookingResponse> bookingResponse = bookingService.getCurrentUserBooking();
@@ -48,6 +51,7 @@ public class BookingController {
 
     }
 
+    @CheckSuspention
     @GetMapping("/{vehicleId}/bookings")
     public ResponseEntity<ApiResponse<List<BookingResponse>>> allBookingOfOneVehicle(@PathVariable Long vehicleId) {
 
@@ -61,6 +65,7 @@ public class BookingController {
                 .build());
     }
 
+    @CheckSuspention
     @PostMapping("/verify")
     public ResponseEntity<?> verifyBooking(@RequestBody BookingRequest request) {
         try {
@@ -87,6 +92,7 @@ public class BookingController {
         }
     }
 
+    @CheckSuspention
     @PostMapping("/confirm")
     public ResponseEntity<BookingResponse> confirmBooking(@RequestBody BookingConfirmRequest confirmRequest) {
         BookingResponse booking = bookingService.confirmBooking(confirmRequest.getToken());
