@@ -33,5 +33,6 @@ public class User {
     @Column(nullable = false)
     private BigDecimal balance = BigDecimal.ZERO;
 
+    private Boolean isSuspended = false;
 
 }
