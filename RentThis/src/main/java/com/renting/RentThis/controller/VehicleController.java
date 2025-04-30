@@ -1,5 +1,6 @@
 package com.renting.RentThis.controller;
 
+import com.renting.RentThis.CustomAnnotation.CheckSuspention;
 import com.renting.RentThis.dto.request.VehicleRequest;
 import com.renting.RentThis.dto.response.ApiResponse;
 import com.renting.RentThis.dto.response.UserResponse;
@@ -45,6 +46,7 @@ public class VehicleController {
     }
 
 
+    @CheckSuspention
     @GetMapping("/getOne")
     public ResponseEntity<ApiResponse<VehicleResponse>> getOneVehicle(
             @ModelAttribute VehicleRequest request,
@@ -60,6 +62,7 @@ public class VehicleController {
                 .build());
     }
 
+    @CheckSuspention
     @GetMapping("/userVehicle")
     public ResponseEntity<ApiResponse<List<VehicleResponse>>> getUserVehicle(@ModelAttribute VehicleRequest request, @RequestParam("id") Long id){
         List<VehicleResponse> vehicles = vehicleService.getUserVehicles(id);
@@ -71,6 +74,7 @@ public class VehicleController {
                 .build());
     }
 
+    @CheckSuspention
     @GetMapping("/currentUserVehicles")
     @PreAuthorize("isAuthenticated")
     public ResponseEntity<ApiResponse<List<VehicleResponse>>> loggedInUserVehicles(@ModelAttribute VehicleRequest request ){
