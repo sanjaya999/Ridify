@@ -1,5 +1,6 @@
 package com.renting.RentThis.controller;
 
+import com.renting.RentThis.CustomAnnotation.CheckSuspention;
 import com.renting.RentThis.dto.response.WalletResponse;
 import com.renting.RentThis.service.WalletData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ public class WalletController {
     @Autowired
     private WalletData walletData;
 
+    @CheckSuspention
     @GetMapping("/balance")
     public ResponseEntity<WalletResponse> getBalance() {
         BigDecimal balance = walletData.getBalance();
