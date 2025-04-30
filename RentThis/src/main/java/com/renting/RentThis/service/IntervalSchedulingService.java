@@ -19,6 +19,7 @@ public class IntervalSchedulingService {
         private final LocalDateTime start;
         private final LocalDateTime end;
 
+
         public TimeSlot(LocalDateTime start, LocalDateTime end) {
             this.start = start;
             this.end = end;
