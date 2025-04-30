@@ -47,6 +47,7 @@ public class UserService {
     }
     public LoginResponse loginUser(LoginRequest request){
 
+
         if (!userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email does not exist");
         }
@@ -54,6 +55,9 @@ public class UserService {
 
         if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
             throw new RuntimeException("Invalid password");
+        }
+        if(user.getIsSuspended()){
+            throw new RuntimeException("User is suspended");
         }
 
         tokenRepository.deleteByUser(user);
@@ -84,4 +88,6 @@ public class UserService {
         return userRepository.findByEmail(currentUserEmail)
                 .orElseThrow(() -> new RuntimeException("User not found with email " + currentUserEmail));
     }
+
+
 }
