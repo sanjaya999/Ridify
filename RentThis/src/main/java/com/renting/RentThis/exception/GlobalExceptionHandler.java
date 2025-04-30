@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,4 +56,15 @@ public class GlobalExceptionHandler {
                         .data(null)
                         .build());
     }
+
+    @ExceptionHandler(UserSuspendedException.class)
+    public ResponseEntity<ApiResponse<String>> handleUserSuspendedException(UserSuspendedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.<String>builder()
+                        .success(false)
+                        .status(HttpStatus.FORBIDDEN.value())
+                        .message(ex.getMessage())
+                        .build());
+    }
+
 }
