@@ -71,10 +71,11 @@ public class VehicleService {
 
     }
 
-    public List<VehicleResponse> getAllVehicle(){
+    public List<VehicleResponse> getAllVehicle() {
         List<Vehicle> vehicles = vehicleRepository.findAll();
 
         List<VehicleResponse> responseList = vehicles.stream()
+                .filter(vehicle -> !vehicle.isSuspended())
                 .map(vehicle -> VehicleResponse.builder()
                         .id(vehicle.getId())
                         .name(vehicle.getName())
@@ -87,9 +88,7 @@ public class VehicleService {
                         .build())
                 .collect(Collectors.toList());
 
-
         return responseList;
-
     }
 
     public VehicleResponse getOneVehicle(Long id) {
