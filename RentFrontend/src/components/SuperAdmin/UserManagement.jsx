@@ -12,8 +12,18 @@ import {
   Typography, 
   Box, 
   CircularProgress, 
-  Alert
+  Alert,
+  Chip,
+  Tooltip,
+  useTheme,
+  useMediaQuery,
+  Avatar
 } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import PersonIcon from '@mui/icons-material/Person';
+import BlockIcon from '@mui/icons-material/Block';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import EmailIcon from '@mui/icons-material/Email';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -21,6 +31,9 @@ const UserManagement = () => {
   const [error, setError] = useState('');
   const [actionInProgress, setActionInProgress] = useState(false);
   const [actionMessage, setActionMessage] = useState({ type: '', text: '' });
+  
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     fetchUsers();
@@ -89,24 +102,97 @@ const UserManagement = () => {
     }
   };
 
+  // Get user initials for avatar
+  const getInitials = (name) => {
+    if (!name) return '?';
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-        <CircularProgress />
+      <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center" 
+        minHeight="60vh"
+        sx={{
+          background: 'linear-gradient(to bottom right, #1a1a1a, #242424)',
+          borderRadius: '16px',
+          padding: '3rem',
+          margin: '2rem',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+          border: '1px solid rgba(255, 255, 255, 0.1)'
+        }}
+      >
+        <CircularProgress sx={{ color: '#90caf9' }} />
       </Box>
     );
   }
 
   return (
-    <Box sx={{ padding: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        User Management
-      </Typography>
+    <Box sx={{ padding: { xs: 1, sm: 2, md: 3 } }}>
+      <Box 
+        sx={{ 
+          background: 'linear-gradient(to right, #1a1a1a, #242424)',
+          borderRadius: '16px',
+          padding: { xs: 2, sm: 3 },
+          marginBottom: 3,
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          justifyContent: 'space-between',
+          alignItems: { xs: 'flex-start', sm: 'center' }
+        }}
+      >
+        <Typography 
+          variant="h4" 
+          gutterBottom={isMobile} 
+          sx={{ 
+            color: '#ffffff',
+            fontWeight: 600,
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+            marginBottom: { sm: 0 }
+          }}
+        >
+          User Management
+        </Typography>
+        
+        <Button 
+          variant="contained" 
+          startIcon={<RefreshIcon />}
+          onClick={fetchUsers} 
+          disabled={loading || actionInProgress}
+          sx={{ 
+            backgroundColor: '#ffffff',
+            color: '#121212',
+            '&:hover': {
+              backgroundColor: '#e0e0e0',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 5px 15px rgba(0, 0, 0, 0.2)'
+            },
+            transition: 'all 0.3s ease',
+            fontWeight: 600,
+            borderRadius: '8px'
+          }}
+        >
+          Refresh Users
+        </Button>
+      </Box>
       
       {actionMessage.text && (
         <Alert 
           severity={actionMessage.type} 
-          sx={{ marginBottom: 2 }}
+          sx={{ 
+            marginBottom: 2,
+            borderRadius: '8px',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+          }}
           onClose={() => setActionMessage({ type: '', text: '' })}
         >
           {actionMessage.text}
@@ -116,81 +202,168 @@ const UserManagement = () => {
       {error && (
         <Alert 
           severity="error" 
-          sx={{ marginBottom: 2 }}
+          sx={{ 
+            marginBottom: 2,
+            borderRadius: '8px',
+            boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)',
+            borderLeft: '4px solid #d32f2f'
+          }}
           onClose={() => setError('')}
         >
           {error}
         </Alert>
       )}
       
-      <Button 
-        variant="contained" 
-        color="primary" 
-        onClick={fetchUsers} 
-        sx={{ marginBottom: 2 }}
-        disabled={loading || actionInProgress}
+      <TableContainer 
+        component={Paper}
+        sx={{
+          background: 'linear-gradient(to bottom right, #1a1a1a, #242424)',
+          borderRadius: '12px',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          overflow: 'hidden'
+        }}
       >
-        Refresh Users
-      </Button>
-      
-      <TableContainer component={Paper}>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Actions</TableCell>
+            <TableRow sx={{ 
+              background: 'rgba(0, 0, 0, 0.2)'
+            }}>
+              <TableCell sx={{ color: '#ffffff', fontWeight: 600 }}>ID</TableCell>
+              <TableCell sx={{ color: '#ffffff', fontWeight: 600 }}>User</TableCell>
+              <TableCell sx={{ color: '#ffffff', fontWeight: 600 }}>Email</TableCell>
+              <TableCell sx={{ color: '#ffffff', fontWeight: 600 }}>Status</TableCell>
+              <TableCell sx={{ color: '#ffffff', fontWeight: 600 }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users.length > 0 ? (
               users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.id}</TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
+                <TableRow 
+                  key={user.id}
+                  sx={{ 
+                    '&:hover': { 
+                      backgroundColor: 'rgba(255, 255, 255, 0.05)'
+                    },
+                    transition: 'background-color 0.3s ease'
+                  }}
+                >
+                  <TableCell sx={{ color: '#e0e0e0' }}>{user.id}</TableCell>
                   <TableCell>
-                    <Box 
-                      component="span" 
-                      sx={{ 
-                        color: user.suspended ? 'error.main' : 'success.main',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {user.suspended ? 'Suspended' : 'Active'}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Avatar 
+                        sx={{ 
+                          bgcolor: '#1a1a1a',
+                          width: 40, 
+                          height: 40,
+                          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                          border: '2px solid #90caf9',
+                          transition: 'transform 0.3s ease',
+                          '&:hover': {
+                            transform: 'scale(1.1)'
+                          }
+                        }}
+                      >
+                        {getInitials(user.name)}
+                      </Avatar>
+                      <Typography sx={{ color: '#ffffff', fontWeight: 500 }}>
+                        {user.name}
+                      </Typography>
                     </Box>
                   </TableCell>
                   <TableCell>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <EmailIcon sx={{ color: '#90caf9', fontSize: 18 }} />
+                      <Typography sx={{ color: '#90caf9' }}>
+                        {user.email}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      icon={user.suspended ? <BlockIcon /> : <CheckCircleIcon />}
+                      label={user.suspended ? 'Suspended' : 'Active'}
+                      sx={{
+                        backgroundColor: user.suspended ? 'rgba(200, 50, 50, 0.2)' : 'rgba(50, 200, 50, 0.2)',
+                        color: user.suspended ? '#ff7961' : '#81c784',
+                        fontWeight: 600,
+                        border: `1px solid ${user.suspended ? '#ff7961' : '#81c784'}`
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>
                     {user.suspended ? (
-                      <Button 
-                        variant="contained" 
-                        color="success" 
-                        onClick={() => handleUnsuspend(user.id)}
-                        disabled={actionInProgress}
-                        size="small"
-                      >
-                        Unsuspend
-                      </Button>
+                      <Tooltip title="Unsuspend User">
+                        <Button 
+                          variant="contained" 
+                          color="success" 
+                          onClick={() => handleUnsuspend(user.id)}
+                          disabled={actionInProgress}
+                          size="small"
+                          startIcon={<CheckCircleIcon />}
+                          sx={{
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                              transform: 'translateY(-2px)',
+                              boxShadow: '0 6px 12px rgba(0, 0, 0, 0.3)'
+                            }
+                          }}
+                        >
+                          Unsuspend
+                        </Button>
+                      </Tooltip>
                     ) : (
-                      <Button 
-                        variant="contained" 
-                        color="error" 
-                        onClick={() => handleSuspend(user.id)}
-                        disabled={actionInProgress}
-                        size="small"
-                      >
-                        Suspend
-                      </Button>
+                      <Tooltip title="Suspend User">
+                        <Button 
+                          variant="contained" 
+                          color="error" 
+                          onClick={() => handleSuspend(user.id)}
+                          disabled={actionInProgress}
+                          size="small"
+                          startIcon={<BlockIcon />}
+                          sx={{
+                            borderRadius: '8px',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                              transform: 'translateY(-2px)',
+                              boxShadow: '0 6px 12px rgba(0, 0, 0, 0.3)'
+                            }
+                          }}
+                        >
+                          Suspend
+                        </Button>
+                      </Tooltip>
                     )}
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} align="center">
-                  No users found
+                <TableCell colSpan={5} align="center" sx={{ color: '#e0e0e0', padding: 4 }}>
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center', 
+                      gap: 2,
+                      padding: 3
+                    }}
+                  >
+                    <PersonIcon sx={{ fontSize: 48, color: '#90caf9' }} />
+                    <Typography variant="h6" sx={{ color: '#ffffff' }}>
+                      No users found
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#aaa' }}>
+                      There are no users in the system yet
+                    </Typography>
+                  </Box>
                 </TableCell>
               </TableRow>
             )}
