@@ -18,6 +18,7 @@ public class VehicleResponse {
     private BigDecimal price;
     private String photoUrl;
     private UserResponse ownerName;
+    private boolean isSuspended;
 
 
 }
