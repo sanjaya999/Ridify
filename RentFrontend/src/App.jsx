@@ -18,6 +18,7 @@ import Upload from './pages/Upload';
 import AllVehicles from './pages/AllVehicles';
 import BrowseVehicles from './pages/BrowseVehicles';
 import UserManagement from './components/SuperAdmin/UserManagement';
+import VehicleManagement from './components/SuperAdmin/VehicleManagement';
 import React, { useState, useEffect } from 'react';
 
 function App() {
@@ -79,6 +80,7 @@ function App() {
           {/* SuperAdmin Routes */}
           <Route element={<SuperAdminRoute />}>
             <Route path="user-management" element={<UserManagement />} />
+            <Route path="vehicle-management" element={<VehicleManagement />} />
           </Route>
         </Route>
 
