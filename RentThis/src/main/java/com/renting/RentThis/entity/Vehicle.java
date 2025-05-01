@@ -30,4 +30,6 @@ public class Vehicle {
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
+
+    private  boolean isSuspended = false;
 }
