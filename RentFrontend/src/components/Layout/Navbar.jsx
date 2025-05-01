@@ -72,6 +72,7 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
     { text: 'Vehicles', path: '/vehicles' },
     ...(isAdmin ? [{ text: 'All Vehicles', path: '/all-vehicles' }] : []),
     ...(isSuperAdmin ? [{ text: 'User Management', path: '/user-management' }] : []),
+    ...(isSuperAdmin ? [{ text: 'Vehicle Management', path: '/vehicle-management' }] : []),
     { text: 'About', path: '/about' },
     { text: 'Contact', path: '/contact' },
   ];
@@ -193,7 +194,10 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
         <MenuItem onClick={handleViewBookings}>My Bookings</MenuItem>
         <MenuItem onClick={() => { navigate('/topup'); handleProfileMenuClose(); }}>Top Up Wallet</MenuItem>
         {isSuperAdmin && (
-          <MenuItem onClick={() => { navigate('/user-management'); handleProfileMenuClose(); }}>User Management</MenuItem>
+          <>
+            <MenuItem onClick={() => { navigate('/user-management'); handleProfileMenuClose(); }}>User Management</MenuItem>
+            <MenuItem onClick={() => { navigate('/vehicle-management'); handleProfileMenuClose(); }}>Vehicle Management</MenuItem>
+          </>
         )}
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
