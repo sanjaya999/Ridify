@@ -76,7 +76,6 @@ public class VehicleController {
 
     @CheckSuspention
     @GetMapping("/currentUserVehicles")
-    @PreAuthorize("isAuthenticated")
     public ResponseEntity<ApiResponse<List<VehicleResponse>>> loggedInUserVehicles(@ModelAttribute VehicleRequest request ){
         List<VehicleResponse> vehicleResponses = vehicleService.loggedInUserVehicles();
 
