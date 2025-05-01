@@ -21,6 +21,15 @@ public class UserDetailsService implements org.springframework.security.core.use
 
     private final UserRepository userRepository;
 
+    /**
+     * Loads the user details based on the provided email address.
+     * This method is used to retrieve user authentication information,
+     * including email, password, and role, by querying the user repository.
+     *
+     * @param email the email address of the user to be loaded
+     * @return a {@code UserDetails} object containing the user's email, password, and role-based authority
+     * @throws UsernameNotFoundException if no user is found with the specified email
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
