@@ -31,6 +31,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Service class responsible for handling payment-related operations.
+ * Includes internal payment processing, Khalti payment initiation, verification,
+ * and transaction record management.
+ */
 @Service
 public class PaymentService {
     private static final Logger log =  LoggerFactory.getLogger(PaymentService.class);
