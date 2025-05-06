@@ -5,7 +5,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import '../../assets/styles/Layout.css';
-
+import SearchBar from '../Search/SearchBar';
 
 const Navbar = ({ walletBalance, refreshWalletBalance }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -33,8 +33,6 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
       refreshWalletBalance();
     }
   }, []);
-
-
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -142,6 +140,10 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
           </ListItem>
         </>
       )}
+      {/* Mobile Search */}
+      <ListItem className="drawer-search-container" sx={{ mb: 2, px: 2 }}>
+        <SearchBar fullWidth={true} closeMobileMenu={handleDrawerToggle} />
+      </ListItem>
     </List>
   );
 
@@ -245,9 +247,16 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
           </div>
 
           {!isMobile && (
-            <div className="nav-links-minimal">
-              {navLinks}
-            </div>
+            <>
+              <div className="nav-links-minimal">
+                {navLinks}
+              </div>
+              
+              {/* Search Component */}
+              <div style={{ margin: '0 16px' }}>
+                <SearchBar />
+              </div>
+            </>
           )}
 
           {authButtons}
