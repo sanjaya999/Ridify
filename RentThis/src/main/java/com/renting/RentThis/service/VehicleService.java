@@ -155,4 +155,22 @@ public class VehicleService {
         return responseList;
 
     }
+
+    public List<VehicleResponse> seearchVehicle(String searchTerm) {
+        List<Vehicle> vehicles = vehicleRepository.findByNameIgnoringSpaces(searchTerm);
+
+        return vehicles.stream()
+                .filter(vehicle -> !vehicle.isSuspended())
+                .map(vehicle -> VehicleResponse.builder()
+                        .id(vehicle.getId())
+                        .name(vehicle.getName())
+                        .model(vehicle.getModel())
+                        .type(vehicle.getType())
+                        .plateNum(vehicle.getPlate_num())
+                        .price(vehicle.getPrice())
+                        .photoUrl(vehicle.getPhotoUrl())
+                        .ownerName(ResponseMapper.toUserMap(vehicle.getOwner()))
+                        .build())
+                .collect(Collectors.toList());
+    }
 }
