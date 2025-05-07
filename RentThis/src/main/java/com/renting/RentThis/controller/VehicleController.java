@@ -7,6 +7,7 @@ import com.renting.RentThis.dto.response.UserResponse;
 import com.renting.RentThis.dto.response.VehicleResponse;
 import com.renting.RentThis.entity.Vehicle;
 import com.renting.RentThis.service.VehicleService;
+import com.renting.RentThis.util.ResponseMapper;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/vehicles")
@@ -85,10 +87,16 @@ public class VehicleController {
                 .data(vehicleResponses)
                 .message("these are the users vehicles")
                 .build());
-
-
     }
 
-
-
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<VehicleResponse>>> searchVehicles(@RequestParam String searchTerm) {
+        List<VehicleResponse> vehicles = vehicleService.seearchVehicle(searchTerm);
+        return ResponseEntity.ok(ApiResponse.<List<VehicleResponse>>builder()
+                .success(true)
+                .status(200)
+                .data(vehicles)
+                .message("Search results")
+                .build());
+    }
 }
