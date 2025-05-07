@@ -1,0 +1,92 @@
+/* SearchBar.css */
+.search-results-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.5rem;
+  background: #1a1a1a;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.search-result-item {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  outline: none;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item:hover,
+.search-result-item:focus {
+  background: rgba(140, 82, 255, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(140, 82, 255, 0.15);
+}
+
+.search-result-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-result-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.search-result-details {
+  flex: 1;
+}
+
+.search-result-name {
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0 0 0.25rem;
+}
+
+.search-result-model {
+  color: #90caf9;
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem;
+}
+
+.search-result-price {
+  color: #4caf50;
+  font-weight: 500;
+  font-size: 1rem;
+  margin: 0;
+}
+
+
+
+/* Custom scrollbar for search results */
+.search-results-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.search-results-container::-webkit-scrollbar-track {
+  background: #242424;
+  border-radius: 8px;
+}
+
+.search-results-container::-webkit-scrollbar-thumb {
+  background: #8c52ff;
+  border-radius: 8px;
+}
+
+.search-results-container::-webkit-scrollbar-thumb:hover {
+  background: #7340d3;
+}
