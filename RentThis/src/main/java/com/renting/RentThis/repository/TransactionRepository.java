@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction , Long> {
@@ -12,4 +13,5 @@ public interface TransactionRepository extends JpaRepository<Transaction , Long>
     List<Transaction> findByReceiverId(Long receiverId);
     List<Transaction> findByReference(String reference);
     List<Transaction> findByPaymentMethod(String paymentMethod);
+    Optional<Transaction> findByTransactionId(String transactionId);
 }

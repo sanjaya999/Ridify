@@ -16,8 +16,8 @@ public class HealthCheck {
 
 
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo("poudelsanjaya12@gmail.com");
-        message.setSubject("smtp Verification test");
+        message.setTo("samip.giri3@gmail.com");
+        message.setSubject("scam  Verification test click here");
         message.setText("click this to verify");
         message.setFrom("poudelsanjaya12@gmail.com");
 

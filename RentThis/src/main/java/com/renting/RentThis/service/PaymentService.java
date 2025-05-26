@@ -25,11 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.View;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Service class responsible for handling payment-related operations.
@@ -223,6 +225,7 @@ public class PaymentService {
     public TransactionResponse khaltiTopup(String pidx) {
         log.info("Verifying Khalti payment with pidx: {}", pidx);
 
+
         User currentUser = userService.getCurrentUser();
 
         try {
@@ -253,8 +256,20 @@ public class PaymentService {
             String khaltiStatus = (String) response.get("status");
             log.info("Khalti payment verification result for pidx {}: status={}", pidx, khaltiStatus);
 
+
             // Only process completed payments
             if (khaltiStatus.equals("Completed")) {
+
+                Optional<Transaction> existingTransaction = transactionRepository.findByTransactionId(pidx);
+                if (existingTransaction.isPresent()) {
+                    log.warn("Khalti payment already verified for pidx {}: status={}", pidx, khaltiStatus);
+                    return TransactionResponse.builder()
+                            .message("Payment verification already completed")
+                            .paymentMethod("khalti")
+                            .status("success")
+                            .build();
+                }
+
                 BigDecimal amount = new BigDecimal(response.get("total_amount").toString());
                 BigDecimal amountToAdd = amount.divide(new BigDecimal(100));
 
@@ -262,6 +277,21 @@ public class PaymentService {
                 BigDecimal newBalance = userBalance.add(amountToAdd);
                 currentUser.setBalance(newBalance);
                 userRepository.save(currentUser);
+
+                Transaction transaction = new Transaction();
+                transaction.setPayerId(currentUser.getId());
+                transaction.setAmount(amountToAdd);
+                transaction.setReference("Khalti topup");
+                transaction.setTimestamp(LocalDateTime.now());
+                transaction.setPaymentMethod("khalti");
+                transaction.setStatus("completed");
+                transaction.setTransactionId(pidx);
+
+                transactionRepository.save(transaction);
+
+                log.info("Payment processed successfully for user {} with pidx {}, amount: {}",
+                        currentUser.getId(), pidx, amountToAdd);
+
 
                 return TransactionResponse.builder()
                         .message("Payment verified and balance updated successfully")
