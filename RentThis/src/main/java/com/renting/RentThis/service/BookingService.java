@@ -10,6 +10,7 @@ import com.renting.RentThis.exception.InsufficientBalanceException;
 import com.renting.RentThis.repository.BookingRespository;
 import com.renting.RentThis.repository.UserRepository;
 import com.renting.RentThis.repository.VehicleRepository;
+import com.renting.RentThis.util.IntervalSchedulingService;
 import com.renting.RentThis.util.ResponseMapper;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.awt.print.Book;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
