@@ -29,5 +29,8 @@ public class VehicleRequest {
 
     private MultipartFile photo;
 
+    private double longitude;
+    private double latitude;
+
 
 }
