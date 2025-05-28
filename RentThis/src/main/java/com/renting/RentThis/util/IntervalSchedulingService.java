@@ -1,4 +1,4 @@
-package com.renting.RentThis.service;
+package com.renting.RentThis.util;
 
 import com.renting.RentThis.entity.Booking;
 import org.springframework.stereotype.Service;
