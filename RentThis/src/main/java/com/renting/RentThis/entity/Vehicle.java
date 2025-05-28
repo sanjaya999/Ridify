@@ -31,5 +31,8 @@ public class Vehicle {
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
 
+    private double latitude;
+    private double longitude;
+
     private  boolean isSuspended = false;
 }

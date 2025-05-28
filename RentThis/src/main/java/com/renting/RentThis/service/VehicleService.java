@@ -6,6 +6,7 @@ import com.renting.RentThis.entity.User;
 import com.renting.RentThis.entity.Vehicle;
 import com.renting.RentThis.repository.UserRepository;
 import com.renting.RentThis.repository.VehicleRepository;
+import com.renting.RentThis.util.Geo;
 import com.renting.RentThis.util.ResponseMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.text.html.Option;
 import java.math.BigDecimal;
+import java.util.AbstractMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,13 +44,13 @@ public class VehicleService {
         vehicle.setModel(request.getModel());
         vehicle.setPlate_num(request.getPlateNum());
         vehicle.setType(request.getType());
-        vehicle.setPrice(request.getPrice());        vehicle.setStatus(request.getStatus());
-
-
-            String photoUrl = fileStorageService.saveFile(photo);
+        vehicle.setPrice(request.getPrice());
+        vehicle.setStatus(request.getStatus());
+        String photoUrl = fileStorageService.saveFile(photo);
             vehicle.setPhotoUrl(photoUrl);
 
-
+        vehicle.setLatitude(request.getLatitude());
+        vehicle.setLongitude(request.getLongitude());
 
 
         String currentUserEmail = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
@@ -66,6 +69,8 @@ public class VehicleService {
                 .price(savedVehicle.getPrice())
                 .photoUrl(savedVehicle.getPhotoUrl())
                 .ownerName(ResponseMapper.toUserMap(savedVehicle.getOwner()))
+                .latitude(savedVehicle.getLatitude())
+                .longitude(savedVehicle.getLongitude())
                 .build();
 
 
@@ -85,6 +90,8 @@ public class VehicleService {
                         .photoUrl(vehicle.getPhotoUrl())
                         .price(vehicle.getPrice())
                         .ownerName(ResponseMapper.toUserMap(vehicle.getOwner()))
+                        .latitude(vehicle.getLatitude())
+                        .longitude(vehicle.getLongitude())
                         .build())
                 .collect(Collectors.toList());
 
@@ -173,4 +180,40 @@ public class VehicleService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    public List<VehicleResponse> getNearestVehicles(double userLat, double userLon) {
+        List<Vehicle> vehicles = vehicleRepository.findAll();
+
+        return vehicles.stream()
+                // Exclude vehicles with invalid coordinates
+                .filter(v -> !(v.getLatitude() == 0.0 && v.getLongitude() == 0.0))
+                // Calculate distance
+                .map(vehicle -> {
+                    double distance = Geo.haversine(userLat, userLon, vehicle.getLatitude(), vehicle.getLongitude());
+                    return new AbstractMap.SimpleEntry<>(vehicle, distance);
+                })
+                // Filter for distance ≤ 3 km
+                .filter(entry -> entry.getValue() <= 3.0)
+                // Sort by distance ascending (optional)
+                .sorted(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))
+                // Map to VehicleResponse DTO
+                .map(entry -> {
+                    Vehicle vehicle = entry.getKey();
+                    return VehicleResponse.builder()
+                            .id(vehicle.getId())
+                            .name(vehicle.getName())
+                            .model(vehicle.getModel())
+                            .type(vehicle.getType())
+                            .plateNum(vehicle.getPlate_num())
+                            .price(vehicle.getPrice())
+                            .photoUrl(vehicle.getPhotoUrl())
+                            .ownerName(ResponseMapper.toUserMap(vehicle.getOwner()))
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+
+
+
 }

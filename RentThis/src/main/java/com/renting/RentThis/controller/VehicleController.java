@@ -99,4 +99,23 @@ public class VehicleController {
                 .message("Search results")
                 .build());
     }
+
+    @PostMapping("/nearest")
+    public ResponseEntity<ApiResponse<List<VehicleResponse>>> getNearestVehicles(
+            @RequestParam double latitude,
+            @RequestParam double longitude) {
+
+        List<VehicleResponse> vehicles = vehicleService.getNearestVehicles(latitude, longitude);
+
+        ApiResponse<List<VehicleResponse>> response = ApiResponse.<List<VehicleResponse>>builder()
+                .success(true)
+                .status(200)
+                .data(vehicles)
+                .message("Nearest vehicles found")
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }
