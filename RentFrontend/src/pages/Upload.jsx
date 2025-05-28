@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { post } from '../api/api';
 import '../assets/styles/Upload.css';
 
@@ -11,7 +11,19 @@ function Upload() {
   const [status, setStatus] = useState('available'); // Default or common value
   const [price, setPrice] = useState('');
   const [photo, setPhoto] = useState(null); // State for the selected file
+  const [location, setLocation] = useState(null)
 
+  useEffect(() => {
+    if("geolocation" in navigator){
+      navigator.geolocation.getCurrentPosition((position) => {
+        const coords = {
+           latitude : position.coords.latitude,
+           longitude : position.coords.longitude
+        }
+        setLocation(coords);
+      })
+    }
+  }, []);
   // State for submission status
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(''); // To show success/error messages
@@ -52,7 +64,8 @@ function Upload() {
     formData.append('plateNum', plateNum);
     formData.append('status', status);
     formData.append('price', price);
-
+    formData.append('latitude', location.latitude);
+    formData.append('longitude', location.longitude);
     try {
       const response = await post('/vehicles/admin/add', formData);
 
