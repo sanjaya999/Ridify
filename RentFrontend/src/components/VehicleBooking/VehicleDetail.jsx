@@ -5,6 +5,7 @@ import '../../assets/styles/VehicleDetail.css';
 
 // API functions
 import { get, post } from '../../api/api';
+import GeoLocation from "../GeoLocation.jsx";
 
 const API_BASE_URL = 'http://localhost:8080';
 
@@ -320,6 +321,7 @@ const VehicleDetail = () => {
           </>
         )}
       </div>
+      <GeoLocation />
     </div>
   );
 };
