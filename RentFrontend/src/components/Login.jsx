@@ -3,8 +3,11 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { TextField, CircularProgress, Alert } from '@mui/material';
 import { post } from "../api/api";
 import '../assets/styles/Login.css';
+import {useAuth} from "../context/AuthContext.jsx";
 
 const Login = () => {
+
+  const {login} = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
@@ -42,12 +45,12 @@ const Login = () => {
     try {
       const response = await post('/api/v1/users/login', formData);
       if (response.success) {
-        localStorage.setItem('user', response.data.id);
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('role', response.data.role);
-        localStorage.setItem('refresh', response.data.refreshToken);
-        
-        // Dispatch a custom event to notify other components about the role change
+        // localStorage.setItem('user', response.data.id);
+        // localStorage.setItem('accessToken', response.data.accessToken);
+        // localStorage.setItem('role', response.data.role);
+        // localStorage.setItem('refresh', response.data.refreshToken);
+        //
+        login(response)
         window.dispatchEvent(new Event('roleChange'));
         
         navigate('/');

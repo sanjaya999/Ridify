@@ -1,20 +1,18 @@
 import { Navigate, Outlet } from 'react-router-dom';
+import {useAuth} from "../../context/AuthContext.jsx";
 
 const SuperAdminRoute = () => {
-  const isAuthenticated = !!localStorage.getItem('accessToken');
-  const isSuperAdmin = localStorage.getItem('role') === 'superAdmin';
-  
-  // If not authenticated or not superadmin, redirect to appropriate page
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  if (!isSuperAdmin) {
-    return <Navigate to="/" replace />;
-  }
+  const{isAuthenticated , user , loading} = useAuth();
 
-  // If authenticated and superadmin, render child routes
-  return <Outlet />;
+  if (loading) {
+       return <div>Loading...</div>;
+    }
+
+  if (!isAuthenticated) {
+         return <Navigate to="/login" replace />;
+      }
+
+  return user?.role === 'superAdmin' ? <Outlet /> : <Navigate to="/" />;
 };
 
 export default SuperAdminRoute;
