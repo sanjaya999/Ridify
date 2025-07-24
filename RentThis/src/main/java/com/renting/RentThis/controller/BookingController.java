@@ -65,7 +65,7 @@ public class BookingController {
                 .build());
     }
 
-    @CheckSuspention
+
     @PostMapping("/verify")
     public ResponseEntity<?> verifyBooking(@RequestBody BookingRequest request) {
         try {

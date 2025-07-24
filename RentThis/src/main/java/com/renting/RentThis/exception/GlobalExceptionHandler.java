@@ -5,6 +5,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -88,6 +89,16 @@ public class GlobalExceptionHandler {
                         .success(false)
                         .status(HttpStatus.UNAUTHORIZED.value())
                         .message(message)
+                        .build());
+    }
+
+    @ExceptionHandler(UserNotAuthenticatedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUserNotAuthenticatedException(UserNotAuthenticatedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .status(HttpStatus.UNAUTHORIZED.value())
+                        .message("You are not logged in. Please log in to access this resource.")
                         .build());
     }
 
