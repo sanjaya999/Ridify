@@ -1,6 +1,8 @@
 package com.renting.RentThis.exception;
 
 import com.renting.RentThis.dto.response.ApiResponse;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -66,5 +68,28 @@ public class GlobalExceptionHandler {
                         .message(ex.getMessage())
                         .build());
     }
+
+    @ExceptionHandler({ExpiredJwtException.class,
+            MalformedJwtException.class})
+    public ResponseEntity<ApiResponse<Object>> handleJwtExceptions
+            (Exception ex) {
+        String message;
+        if (ex instanceof ExpiredJwtException) {
+            message = "JWT token has expired";
+        } else if (ex instanceof MalformedJwtException) {
+            message = "JWT token is malformed or invalid";
+        } else {
+            message = "Invalid JWT token";
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.builder()
+                        .success(false)
+                        .status(HttpStatus.UNAUTHORIZED.value())
+                        .message(message)
+                        .build());
+    }
+
 
 }
