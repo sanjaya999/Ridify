@@ -4,15 +4,18 @@ import com.renting.RentThis.dto.request.LoginRequest;
 import com.renting.RentThis.dto.request.UserRegistrationRequest;
 import com.renting.RentThis.dto.response.LoginResponse;
 import com.renting.RentThis.dto.response.UserResponse;
+import com.renting.RentThis.entity.Token;
 import com.renting.RentThis.entity.User;
 import com.renting.RentThis.repository.TokenRepository;
 import com.renting.RentThis.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Service
@@ -22,6 +25,10 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private  final JwtService jwtService;
     private final TokenRepository tokenRepository;
+
+    @Value("${jwt.refresh.expiration}")
+    private long refreshTokenExpiry;
+
 
     public  UserResponse registerUser(UserRegistrationRequest request){
 
@@ -60,7 +67,7 @@ public class UserService {
             throw new RuntimeException("User is suspended");
         }
 
-        tokenRepository.deleteByUser(user);
+        tokenRepository.deleteByUserId(user.getId());
 
         var userDetails = new org.springframework.security.core.userdetails.User(
                 user.getEmail(),  // Using email instead of username
@@ -70,6 +77,13 @@ public class UserService {
 
         String accessToken = jwtService.generateAccessToken(user.getId() , user.getEmail(), user.getRole());
         String refreshToken = jwtService.generateRefreshToken(user.getId(),  user.getEmail(), user.getRole());
+
+       Token token = new Token();
+       token.setRefreshToken(refreshToken);
+       token.setUser(user);
+       token.setValid(true);
+       token.setExpiryDate(LocalDateTime.now().plusNanos(refreshTokenExpiry*10000L));
+       tokenRepository.save(token);
 
 
         return LoginResponse.builder()

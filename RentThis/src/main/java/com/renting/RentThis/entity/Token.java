@@ -1,6 +1,7 @@
 package com.renting.RentThis.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Token")
+@Data
 public class Token {
 
     @Id
@@ -19,7 +21,7 @@ public class Token {
 
     private boolean isValid;
 
-    @ManyToOne  // ✅ Correct annotation
+    @ManyToOne
     @JoinColumn(name="user_id") // ✅ Creates a foreign key column in the Token table
     private User user;
 
