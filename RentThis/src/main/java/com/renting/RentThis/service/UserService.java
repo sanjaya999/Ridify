@@ -6,10 +6,12 @@ import com.renting.RentThis.dto.response.LoginResponse;
 import com.renting.RentThis.dto.response.UserResponse;
 import com.renting.RentThis.entity.Token;
 import com.renting.RentThis.entity.User;
+import com.renting.RentThis.exception.UserNotAuthenticatedException;
 import com.renting.RentThis.repository.TokenRepository;
 import com.renting.RentThis.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -98,9 +100,22 @@ public class UserService {
     }
 
     public User getCurrentUser() {
-        String currentUserEmail = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-        return userRepository.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new RuntimeException("User not found with email " + currentUserEmail));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Check if authentication is null or not authenticated
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new UserNotAuthenticatedException("User not authenticated");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            String email = ((UserDetails) principal).getUsername();
+            return userRepository.findByEmail(email)
+                    .orElseThrow(() -> new UserNotAuthenticatedException("User not found with email " + email));
+        } else {
+            throw new UserNotAuthenticatedException("User not authenticated");
+        }
     }
 
 

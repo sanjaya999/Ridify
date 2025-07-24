@@ -34,12 +34,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
+                .anonymous(anoymous -> anoymous.disable())
                 // Configure CORS within Spring Security
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/v1/users/**").permitAll()
-                            .requestMatchers("/vehicles/**").permitAll()
-                            .requestMatchers("/uploads/**").permitAll()
+                            .requestMatchers("/api/v1/book/verify").authenticated()
+                            .requestMatchers("/api/v1/book/**").permitAll()                            .requestMatchers("/uploads/**").permitAll()
                             .requestMatchers("/api/v1/payments/khaltiCall/callback").permitAll()
                             .requestMatchers("/api/v1/auth/refresh").permitAll()
                             // OPTIONS requests will be handled by the cors configuration above
