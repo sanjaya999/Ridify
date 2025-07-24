@@ -48,7 +48,7 @@ public class VehicleController {
     }
 
 
-    @CheckSuspention
+
     @GetMapping("/getOne")
     public ResponseEntity<ApiResponse<VehicleResponse>> getOneVehicle(
             @ModelAttribute VehicleRequest request,

@@ -1,6 +1,7 @@
 package com.renting.RentThis.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -23,6 +24,7 @@ public class Vehicle {
 
     private String plate_num;
 
+    @Positive(message="Price must be positive")
     private BigDecimal price;
 
     private String status;
