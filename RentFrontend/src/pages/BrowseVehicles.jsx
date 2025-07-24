@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get } from '../api/api';
 import '../assets/styles/BrowseVehicles.css';
+import {useAuth} from "../context/AuthContext.jsx";
 
 const BrowseVehicles = () => {
   const navigate = useNavigate();
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const {isAuthenticated } = useAuth();
 
   useEffect(() => {
     const fetchAllVehicles = async () => {
@@ -56,6 +58,13 @@ const BrowseVehicles = () => {
     e.target.style.display = 'none';
     e.target.nextSibling.style.display = 'block';
   };
+
+  function handleBooking(id) {
+    if(isAuthenticated){
+      navigate(`/aboutVehicle/${id}`)
+    }else{
+      navigate(`/aboutVehicle/${id}`)    }
+  }
 
   return (
     <div className="browse-vehicles-container">
@@ -107,7 +116,7 @@ const BrowseVehicles = () => {
                     <p className="vehicle-price">{formatPrice(vehicle.price)}</p>
                     <button 
                       className="book-button"
-                      onClick={() => navigate(`/aboutVehicle/${vehicle.id}`)}
+                      onClick={() => handleBooking(vehicle.id)}
                     >
                       Book Now
                     </button>

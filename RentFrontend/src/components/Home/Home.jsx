@@ -3,10 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
 import { get } from '../../api/api';
 import '../../assets/styles/Home.css';
+import {useAuth} from "../../context/AuthContext.jsx";
 
 const Home = () => {
   const navigate = useNavigate();
-  
+  const{isAuthenticated } = useAuth();
   // Fetch only a limited number of featured vehicles for the landing page
   const fetchFeaturedVehicles = async () => {
     const { data } = await get(`vehicles/getAll`);
@@ -137,8 +138,8 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Call to Action Section */}
-      <section className="cta-section">
+
+      {isAuthenticated ? <></> : <section className="cta-section">
         <h2 className="cta-title">Ready to Hit the Road?</h2>
         <p className="cta-description">
           Join thousands of satisfied customers who have experienced the convenience and reliability of Ridify.
@@ -147,7 +148,7 @@ const Home = () => {
         <Link to="/register" className="cta-button">
           Sign Up Now
         </Link>
-      </section>
+      </section>}
     </div>
   );
 };

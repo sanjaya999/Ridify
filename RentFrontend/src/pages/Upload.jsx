@@ -196,7 +196,8 @@ function Upload() {
               type="number"
               id="price"
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              min="0"
+              onChange={(e) => setPrice(Math.max(0 , e.target.value))}
               required
               placeholder="e.g., 500"
             />
