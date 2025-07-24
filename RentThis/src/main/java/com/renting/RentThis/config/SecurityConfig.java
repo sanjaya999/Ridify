@@ -1,5 +1,7 @@
 package com.renting.RentThis.config;
 
+//import com.renting.RentThis.filter.CustomAuthenticationEntryPoint;
+import com.renting.RentThis.filter.CustomAuthenticationEntryPoint;
 import com.renting.RentThis.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +27,7 @@ import java.util.List; // Import List
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
 
     @Bean
@@ -38,10 +41,12 @@ public class SecurityConfig {
                             .requestMatchers("/vehicles/**").permitAll()
                             .requestMatchers("/uploads/**").permitAll()
                             .requestMatchers("/api/v1/payments/khaltiCall/callback").permitAll()
+                            .requestMatchers("/api/v1/auth/refresh").permitAll()
                             // OPTIONS requests will be handled by the cors configuration above
                             .anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex ->ex.authenticationEntryPoint(customAuthenticationEntryPoint))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form.disable())
                 .build();
