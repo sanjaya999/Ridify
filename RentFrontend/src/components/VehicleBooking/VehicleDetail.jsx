@@ -203,7 +203,7 @@ const VehicleDetail = () => {
 
   // Render Logic
   if (isLoading) return <p>Loading vehicle details...</p>;
-  if (queryError) return <p>Error loading vehicle: {queryError.message}</p>;
+  if (queryError) return <p>Error loading vehicle: {queryError.response.data.message}</p>;
   if (!data || !data.data) return <p>Vehicle not found.</p>;
 
   const vehicle = data.data;
@@ -306,18 +306,18 @@ const VehicleDetail = () => {
               </p>
             )}
 
-            {/* Debug section */}
-            <div className="debug-info">
-              <p>Debug Info (Format Sent to Backend):</p>
-              <pre>
-                {JSON.stringify({
-                  vehicleId: id ? parseInt(id, 10) : null,
-                  startTimeToSend: startDateTime ? `${startDateTime}:00` : null,
-                  endTimeToSend: endDateTime ? `${endDateTime}:00` : null,
-                  currentState: { startDateTime, endDateTime, duration, isBooked }
-                }, null, 2)}
-              </pre>
-            </div>
+            {/*/!* Debug section *!/*/}
+            {/*<div className="debug-info">*/}
+            {/*  <p>Debug Info (Format Sent to Backend):</p>*/}
+            {/*  <pre>*/}
+            {/*    {JSON.stringify({*/}
+            {/*      vehicleId: id ? parseInt(id, 10) : null,*/}
+            {/*      startTimeToSend: startDateTime ? `${startDateTime}:00` : null,*/}
+            {/*      endTimeToSend: endDateTime ? `${endDateTime}:00` : null,*/}
+            {/*      currentState: { startDateTime, endDateTime, duration, isBooked }*/}
+            {/*    }, null, 2)}*/}
+            {/*  </pre>*/}
+            {/*</div>*/}
           </>
         )}
       </div>
