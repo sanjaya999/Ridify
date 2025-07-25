@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/v1/users/**").permitAll()
+                            .requestMatchers("/vehicles/**").permitAll()
                             .requestMatchers("/api/v1/book/verify").authenticated()
                             .requestMatchers("/api/v1/book/**").permitAll()                            .requestMatchers("/uploads/**").permitAll()
                             .requestMatchers("/api/v1/payments/khaltiCall/callback").permitAll()
