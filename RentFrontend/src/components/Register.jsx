@@ -11,7 +11,8 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'customer'
+    role: 'customer',
+    phoneNumber: ''
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -33,7 +34,8 @@ const Register = () => {
         name: formData.fullName,
         email: formData.email,
         password: formData.password,
-        role: formData.role
+        role: formData.role,
+        phoneNumber: formData.phoneNumber
       });
       
       if (response.success) {
@@ -88,6 +90,7 @@ const Register = () => {
               label="Password"
               type="password"
               name="password"
+
               value={formData.password}
               onChange={handleChange}
               variant="outlined"
@@ -102,6 +105,17 @@ const Register = () => {
               value={formData.confirmPassword}
               onChange={handleChange}
               variant="outlined"
+            />
+          </div>
+          <div className="form-group">
+            <TextField
+                fullWidth
+                label="Phone Number"
+                type="number"
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                variant="outlined"
             />
           </div>
           <div className="form-group">

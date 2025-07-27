@@ -163,41 +163,22 @@ const Bookings = () => {
                         />
                       )}
                     </Typography>
+                    <Typography variant="body2" color="#ccc" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                      <strong>Owner Phone Number:</strong>&nbsp;
+                      {console.log(booking.vehicle.ownerName?.phoneNumber)}
+                      {booking.vehicle?.ownerName?.phoneNumber}
+                      {booking.paymentMethod === 'Khalti' && (
+                          <img
+                              src="/khalti-logo.png"
+                              alt="Khalti"
+                              style={{ height: '16px', marginLeft: '8px' }}
+                          />
+                      )}
+                    </Typography>
                   </Grid>
                 </CardContent>
                 <Divider sx={{ backgroundColor: '#333' }} />
-                <CardActions sx={{ p: 2, justifyContent: 'flex-end', backgroundColor: '#1a1a1a' }}>
-                  <Button 
-                    size="small" 
-                    sx={{ 
-                      backgroundColor: '#444',
-                      color: 'white',
-                      textTransform: 'none',
-                      '&:hover': {
-                        backgroundColor: '#666'
-                      }
-                    }}
-                  >
-                    View Details
-                  </Button>
-                  {booking.status.toLowerCase() === 'pending' && (
-                    <Button 
-                      size="small" 
-                      sx={{ 
-                        ml: 1,
-                        borderColor: '#f44336',
-                        color: '#f44336',
-                        textTransform: 'none',
-                        '&:hover': {
-                          backgroundColor: 'rgba(244, 67, 54, 0.1)'
-                        }
-                      }}
-                      variant="outlined"
-                    >
-                      Cancel Booking
-                    </Button>
-                  )}
-                </CardActions>
+
               </Box>
             </Card>
           ))}

@@ -138,12 +138,13 @@ const VehicleBookings = ({ vehicleId, vehicleName, onClose }) => {
                       <span className="booking-user-email">
                         {booking.bookedUser?.email || 'No email provided'}
                       </span>
+                      <span className="booking-user-email">Phone:
+                        {booking.bookedUser?.phoneNumber || 'No Phone Number provided'}
+                      </span>
                     </div>
                   </div>
                   
-                  <div className="booking-duration">
-                    Duration: {calculateDuration(booking.startDate, booking.endDate)}
-                  </div>
+
                 </div>
               ))}
             </div>
