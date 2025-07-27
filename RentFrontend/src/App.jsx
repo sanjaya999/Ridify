@@ -57,8 +57,6 @@ function App() {
 
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="about" element={<div>About Page</div>} />
-          <Route path="contact" element={<div>Contact Page</div>} />
           <Route path="/aboutVehicle/:id" element={<VehicleDetail />} />
           <Route path="/confirm-booking" element={<ConfirmBooking />} />
           <Route path="/booking-details" element={<BookingDetailsWrapper />} />
