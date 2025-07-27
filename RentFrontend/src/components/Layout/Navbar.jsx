@@ -22,6 +22,7 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     const storedUserId = localStorage.getItem('userId');
+    const userName = localStorage.getItem('userName');
     setIsAuthenticated(!!token);
     if (storedUserId) {
       setUserId(storedUserId);
@@ -34,6 +35,7 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
     }
   }, []);
 
+    const userName = localStorage.getItem('userName');
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -71,8 +73,7 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
     ...(isAdmin ? [{ text: 'All Vehicles', path: '/all-vehicles' }] : []),
     ...(isSuperAdmin ? [{ text: 'User Management', path: '/user-management' }] : []),
     ...(isSuperAdmin ? [{ text: 'Vehicle Management', path: '/vehicle-management' }] : []),
-    { text: 'About', path: '/about' },
-    { text: 'Contact', path: '/contact' },
+
   ];
 
   const navLinks = (
@@ -152,6 +153,9 @@ const Navbar = ({ walletBalance, refreshWalletBalance }) => {
       <div className="wallet-balance" style={{ marginRight: 16, fontWeight: 500 }}>
         Wallet: NPR {walletBalance !== null ? walletBalance : '--'}
       </div>
+        <div  style={{ marginRight: 16, fontWeight: 500 }}>
+            {userName}
+        </div>
       <Button
         component={NavLink}
         to="/topup"

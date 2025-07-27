@@ -209,120 +209,113 @@ const VehicleDetail = () => {
   const vehicle = data.data;
 
   return (
-    <div className="vehicle-detail-container">
-      {/* Vehicle Info Section */}
-      <div className="vehicle-info">
-        <h1>{vehicle.name}</h1>
-        {vehicle.photoUrl && (
-          <img
-            src={`${API_BASE_URL}/${vehicle.photoUrl.startsWith('/') ? vehicle.photoUrl.substring(1) : vehicle.photoUrl}`}
-            alt={vehicle.name}
-            className="vehicle-image"
-            onError={(e) => { e.target.style.display = 'none'; }}
-          />
-        )}
-        <div className="vehicle-specs">
-          <p><strong>Model:</strong> {vehicle.model || 'N/A'}</p>
-          <p><strong>Plate Number:</strong> {vehicle.plateNum || 'N/A'}</p>
-          <p><strong>Price:</strong> ${vehicle.price ? vehicle.price.toFixed(2) : 'N/A'}/day</p>
-          <p><strong>Type:</strong> {vehicle.type || 'N/A'}</p>
-        </div>
-      </div>
-
-      {/* Booking Section */}
-      <div className="booking-section">
-        <h2>Book this Vehicle</h2>
-
-        {!showDatePicker ? (
-          <button
-            className="book-button"
-            onClick={handleShowBooking}
-            disabled={isBooked}
-          >
-            {isBooked ? 'Booked!' : 'Book Now'}
-          </button>
-        ) : (
-          <>
-            {/* Date Time Pickers */}
-            <div className="date-time-container">
-              <div className="date-time-header">
-                <span>Select start time:</span>
-                <span>Select end time:</span>
-              </div>
-              <div className="date-time-pickers">
-                <div className="datetime-picker">
-                  <input
-                    type="datetime-local"
-                    min={minDateTime}
-                    value={startDateTime}
-                    onChange={(e) => handleStartDateChange(e.target.value)}
-                    disabled={isBooked || bookingMutation.isPending}
-                  />
-                </div>
-                <div className="datetime-picker">
-                  <input
-                    type="datetime-local"
-                    min={startDateTime || minDateTime}
-                    value={endDateTime}
-                    onChange={(e) => handleEndDateChange(e.target.value)}
-                    disabled={isBooked || bookingMutation.isPending || !startDateTime}
-                  />
-                </div>
-              </div>
-
-              {/* Display selected times */}
-              {startDateTime && endDateTime && (
-                <div className="selected-time-details">
-                  <p>Selected: {formatDateTime(startDateTime)} to {formatDateTime(endDateTime)}</p>
-                  {duration > 0 ? (
-                    <p>Duration: {duration} hour(s)</p>
-                  ) : (
-                    <p className="warning-text">Duration: End time must be after start time.</p>
-                  )}
-                </div>
-              )}
+      <div className="vehicle-page-wrapper">
+        <div className="vehicle-detail-container">
+          {/* Vehicle Info Section */}
+          <div className="vehicle-info">
+            <h1>{vehicle.name}</h1>
+            {vehicle.photoUrl && (
+                <img
+                    src={`${API_BASE_URL}/${vehicle.photoUrl.startsWith('/') ? vehicle.photoUrl.substring(1) : vehicle.photoUrl}`}
+                    alt={vehicle.name}
+                    className="vehicle-image"
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                />
+            )}
+            <div className="vehicle-specs">
+              <p><strong>Model:</strong> {vehicle.model || 'N/A'}</p>
+              <p><strong>Plate Number:</strong> {vehicle.plateNum || 'N/A'}</p>
+              <p><strong>Price:</strong> ${vehicle.price ? vehicle.price.toFixed(2) : 'N/A'}/day</p>
+              <p><strong>Type:</strong> {vehicle.type || 'N/A'}</p>
             </div>
+          </div>
 
-            {/* Error Message Display */}
-            {errorMessage && (
-              <div className="availability-error">
-                {formatAvailabilityMessage(errorMessage)}
-              </div>
+          {/* Booking Section */}
+          <div className="booking-section">
+            <h2>Book this Vehicle</h2>
+
+            {!showDatePicker ? (
+                <button
+                    className="book-button"
+                    onClick={handleShowBooking}
+                    disabled={isBooked}
+                >
+                  {isBooked ? 'Booked!' : 'Book Now'}
+                </button>
+            ) : (
+                <>
+                  {/* Date Time Pickers */}
+                  <div className="date-time-container">
+                    <div className="date-time-header">
+                      <span>Select start time:</span>
+                      <span>Select end time:</span>
+                    </div>
+                    <div className="date-time-pickers">
+                      <div className="datetime-picker">
+                        <input
+                            type="datetime-local"
+                            min={minDateTime}
+                            value={startDateTime}
+                            onChange={(e) => handleStartDateChange(e.target.value)}
+                            disabled={isBooked || bookingMutation.isPending}
+                        />
+                      </div>
+                      <div className="datetime-picker">
+                        <input
+                            type="datetime-local"
+                            min={startDateTime || minDateTime}
+                            value={endDateTime}
+                            onChange={(e) => handleEndDateChange(e.target.value)}
+                            disabled={isBooked || bookingMutation.isPending || !startDateTime}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Display selected times */}
+                    {startDateTime && endDateTime && (
+                        <div className="selected-time-details">
+                          <p>Selected: {formatDateTime(startDateTime)} to {formatDateTime(endDateTime)}</p>
+                          {duration > 0 ? (
+                              <p>Duration: {duration} hour(s)</p>
+                          ) : (
+                              <p className="warning-text">Duration: End time must be after start time.</p>
+                          )}
+                        </div>
+                    )}
+                  </div>
+
+                  {/* Error Message Display */}
+                  {errorMessage && (
+                      <div className="availability-error">
+                        {formatAvailabilityMessage(errorMessage)}
+                      </div>
+                  )}
+
+                  {/* Booking Button */}
+                  <button
+                      className={`book-button ${isBooked ? '' : 'confirm-button'}`}
+                      onClick={handleBooking}
+                      disabled={isBooked || bookingMutation.isPending || !startDateTime || !endDateTime || duration <= 0}
+                  >
+                    {bookingMutation.isPending ? 'Processing...' : (isBooked ? 'Booked!' : 'Confirm Booking')}
+                  </button>
+
+                  {/* Booking Confirmation Message */}
+                  {isBooked && (
+                      <p className="booking-confirmation">
+                        Your booking has been confirmed from {formatDateTime(startDateTime)} to {formatDateTime(endDateTime)}
+                      </p>
+                  )}
+                </>
             )}
+          </div>
+        </div>
 
-            {/* Booking Button */}
-            <button
-              className={`book-button ${isBooked ? '' : 'confirm-button'}`}
-              onClick={handleBooking}
-              disabled={isBooked || bookingMutation.isPending || !startDateTime || !endDateTime || duration <= 0}
-            >
-              {bookingMutation.isPending ? 'Processing...' : (isBooked ? 'Booked!' : 'Confirm Booking')}
-            </button>
+        {/* Nearest Vehicles Section - Now outside the grid container */}
 
-            {/* Booking Confirmation Message */}
-            {isBooked && (
-              <p className="booking-confirmation">
-                Your booking has been confirmed from {formatDateTime(startDateTime)} to {formatDateTime(endDateTime)}
-              </p>
-            )}
 
-            {/*/!* Debug section *!/*/}
-            {/*<div className="debug-info">*/}
-            {/*  <p>Debug Info (Format Sent to Backend):</p>*/}
-            {/*  <pre>*/}
-            {/*    {JSON.stringify({*/}
-            {/*      vehicleId: id ? parseInt(id, 10) : null,*/}
-            {/*      startTimeToSend: startDateTime ? `${startDateTime}:00` : null,*/}
-            {/*      endTimeToSend: endDateTime ? `${endDateTime}:00` : null,*/}
-            {/*      currentState: { startDateTime, endDateTime, duration, isBooked }*/}
-            {/*    }, null, 2)}*/}
-            {/*  </pre>*/}
-            {/*</div>*/}
-          </>
-        )}
+        <GeoLocation />
       </div>
-      <GeoLocation />
-    </div>
   );
 };
 
