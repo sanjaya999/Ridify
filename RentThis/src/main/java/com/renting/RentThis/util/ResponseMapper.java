@@ -11,6 +11,7 @@ public class ResponseMapper {
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
                 .build();
     }
 

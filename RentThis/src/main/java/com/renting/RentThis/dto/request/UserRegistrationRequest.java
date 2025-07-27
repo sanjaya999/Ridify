@@ -2,6 +2,7 @@ package com.renting.RentThis.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -21,4 +22,7 @@ public class UserRegistrationRequest {
 
     @NotBlank(message =  "Please specify your role")
     private String role;
+
+    @NotNull(message =  "Please specify your phone number")
+    private long phoneNumber;
 }

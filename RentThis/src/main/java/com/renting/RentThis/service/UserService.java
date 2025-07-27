@@ -41,6 +41,7 @@ public class UserService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setRole(request.getRole());
+        user.setPhoneNumber(request.getPhoneNumber());
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         user.setPassword(encodedPassword);
         User savedUser = userRepository.save(user);
