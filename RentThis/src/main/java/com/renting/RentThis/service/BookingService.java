@@ -163,6 +163,7 @@ public class BookingService {
                         .paymentMethod(booking.getPaymentMethod())
                         .startDate(booking.getStartTime())
                         .endDate(booking.getEndTime())
+                        .phoneNumber(booking.getUser().getPhoneNumber())
                         .bookedUser(ResponseMapper.toUserMap(booking.getUser()))
                         .status(booking.getStatus())
                         .build())

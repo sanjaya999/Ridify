@@ -19,6 +19,7 @@ public class BookingResponse {
     private UserResponse bookedUser;
     private String status;
     private String paymentMethod;
+    private long phoneNumber;
 
 
 

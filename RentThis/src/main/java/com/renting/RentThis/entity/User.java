@@ -25,6 +25,8 @@ public class User {
 
     private  String role;
 
+    private Long phoneNumber;
+
     @Override
     public String toString() {
         return "User(id=" + id + ", name=" + name + ", email=" + email + ", role=" + role + ")";
