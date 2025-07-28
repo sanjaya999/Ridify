@@ -88,12 +88,14 @@ public class JwtService {
 
 
     public String generateBookingVerificationToken(Long userId , Long vehicleId,
-                                                   String startTime , String endTime , long minutesToExpire){
+                                                   String startTime , String endTime , long minutesToExpire ,String startingAddress , String endingAddress){
         Map<String , Object> claims = new HashMap<>();
         claims.put("userId" , userId);
         claims.put("vehicleId" , vehicleId);
         claims.put("startTime" , startTime);
         claims.put("endTime" , endTime);
+        claims.put("startingAddress" , startingAddress);
+        claims.put("endingAddress" , endingAddress);
 
         return Jwts.builder()
                 .setClaims(claims)
