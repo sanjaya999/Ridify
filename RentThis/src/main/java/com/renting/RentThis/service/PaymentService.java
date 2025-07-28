@@ -154,6 +154,8 @@ public class PaymentService {
         Long vehicleId = Long.parseLong(claims.get("vehicleId").toString());
         LocalDateTime startTime = LocalDateTime.parse(claims.get("startTime").toString());
         LocalDateTime endTime = LocalDateTime.parse(claims.get("endTime").toString());
+        String startingAddress = claims.get("startingAddress").toString();
+        String endingAddress = claims.get("endingAddress").toString();
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -189,6 +191,8 @@ public class PaymentService {
             booking.setStartTime(startTime);
             booking.setEndTime(endTime);
             booking.setStatus("Confirmed");
+            booking.setStartingAddress(startingAddress);
+            booking.setEndingAddress(endingAddress);
             booking.setPaymentMethod("Khalti");
 
             Booking saveBooking = bookingRespository.save(booking);

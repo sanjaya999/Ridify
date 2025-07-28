@@ -65,6 +65,8 @@ public class KhaltiController {
         LocalDateTime startTime = LocalDateTime.parse(claims.get("startTime").toString());
 
         LocalDateTime endTime = LocalDateTime.parse(claims.get("endTime").toString());
+        String startingAddress = claims.get("startingAddress").toString();
+        String endingAddress = claims.get("endingAddress").toString();
 
         BigDecimal dbAmount =bookingService.calculateAmount(vehicle, startTime, endTime);
         BigDecimal multiplier = new BigDecimal("100");
