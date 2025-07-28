@@ -165,15 +165,15 @@ const Bookings = () => {
                     </Typography>
                     <Typography variant="body2" color="#ccc" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
                       <strong>Owner Phone Number:</strong>&nbsp;
-                      {console.log(booking.vehicle.ownerName?.phoneNumber)}
                       {booking.vehicle?.ownerName?.phoneNumber}
-                      {booking.paymentMethod === 'Khalti' && (
-                          <img
-                              src="/khalti-logo.png"
-                              alt="Khalti"
-                              style={{ height: '16px', marginLeft: '8px' }}
-                          />
-                      )}
+                    </Typography>
+                    <Typography variant="body2" color="#ccc" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                      <strong>Pickup Address: </strong>&nbsp;
+                      {booking?.startingAddress}
+                    </Typography>
+                    <Typography variant="body2" color="#ccc" sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
+                      <strong>Drop Address: </strong>&nbsp;
+                      {booking?.endingAddress}
                     </Typography>
                   </Grid>
                 </CardContent>

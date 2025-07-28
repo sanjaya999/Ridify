@@ -40,6 +40,9 @@ const VehicleDetail = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [duration, setDuration] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
+  const [startingAddress, setStartingAddress] = useState('');
+  const [endingAddress, setEndingAddress] = useState('');
+
 
   // React Query Hooks
   const { data, isLoading, error: queryError } = useQuery({
@@ -147,6 +150,8 @@ const VehicleDetail = () => {
     setEndDateTime(value);
   };
 
+
+
   const handleShowBooking = () => {
     setShowDatePicker(true);
     const nowValue = getMinDateTime();
@@ -165,6 +170,16 @@ const VehicleDetail = () => {
       setErrorMessage('Please select a valid start and end time.');
       return;
     }
+    if (!startingAddress || startingAddress.trim() === '') {
+      setErrorMessage('Please enter a starting address.');
+      return;
+    }
+
+    // Validate ending address
+    if (!endingAddress || endingAddress.trim() === '') {
+      setErrorMessage('Please enter an ending address.');
+      return;
+    }
 
     const formattedStartTime = `${startDateTime}:00`;
     const formattedEndTime = `${endDateTime}:00`;
@@ -172,7 +187,10 @@ const VehicleDetail = () => {
     const bookingData = {
       vehicleId: parseInt(id, 10),
       startTime: formattedStartTime,
-      endTime: formattedEndTime
+      endTime: formattedEndTime,
+      startingAddress,
+      endingAddress,
+
     };
 
     bookingMutation.mutate(bookingData);
@@ -283,6 +301,29 @@ const VehicleDetail = () => {
                         </div>
                     )}
                   </div>
+                  <div className="address-input">
+                    <label>Starting Address:</label>
+                    <input
+                        type="text"
+                        value={startingAddress}
+                        onChange={(e) => setStartingAddress(e.target.value)}
+                        placeholder="Enter pickup location"
+                        disabled={isBooked || bookingMutation.isPending}
+                        required
+                    />
+                  </div>
+                  <div className="address-input">
+                    <label>Ending Address:</label>
+                    <input
+                        type="text"
+                        value={endingAddress}
+                        onChange={(e) => setEndingAddress(e.target.value)}
+                        placeholder="Enter drop-off location"
+                        disabled={isBooked || bookingMutation.isPending}
+                        required
+                    />
+                  </div>
+
 
                   {/* Error Message Display */}
                   {errorMessage && (

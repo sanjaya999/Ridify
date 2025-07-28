@@ -143,6 +143,31 @@ const VehicleBookings = ({ vehicleId, vehicleName, onClose }) => {
                       </span>
                     </div>
                   </div>
+                  <div className="booking-addresses">
+                    <div className="booking-address-item">
+                      <div className="booking-address-icon pickup-icon">
+                        ↑
+                      </div>
+                      <div className="booking-address-content">
+                        <span className="booking-address-label">Pickup Location</span>
+                        <span className="booking-address-value">
+                          {booking?.startingAddress || 'No pickup location provided'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="booking-address-item">
+                      <div className="booking-address-icon drop-icon">
+                        ↓
+                      </div>
+                      <div className="booking-address-content">
+                        <span className="booking-address-label">Drop Location</span>
+                        <span className="booking-address-value">
+                          {booking?.endingAddress || 'No drop location provided'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                   
 
                 </div>

@@ -1,4 +1,4 @@
-/* VehicleBookings.css - Styling for the vehicle bookings modal */
+/* VehicleBookings.css - Simplified styling for the vehicle bookings modal */
 
 .bookings-modal-backdrop {
   position: fixed;
@@ -11,14 +11,12 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  backdrop-filter: blur(5px);
 }
 
 .bookings-modal {
-  background: linear-gradient(to bottom right, #1a1a1a, #242424);
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  border: 2px solid #90caf9;
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
@@ -31,7 +29,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #333;
 }
 
 .bookings-modal-title {
@@ -39,7 +37,6 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0;
-  letter-spacing: 0.5px;
 }
 
 .bookings-modal-close {
@@ -48,7 +45,6 @@
   color: #e0e0e0;
   font-size: 1.5rem;
   cursor: pointer;
-  transition: color 0.3s ease;
 }
 
 .bookings-modal-close:hover {
@@ -66,16 +62,14 @@
 }
 
 .booking-item {
-  background: rgba(26, 26, 26, 0.9);
-  border-radius: 10px;
+  background-color: #242424;
+  border-radius: 8px;
   padding: 1.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #333;
 }
 
 .booking-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border-color: #555;
 }
 
 .booking-header {
@@ -92,29 +86,29 @@
 }
 
 .booking-status {
-  padding: 0.35rem 0.75rem;
-  border-radius: 20px;
+  padding: 0.3rem 0.7rem;
+  border-radius: 15px;
   font-size: 0.8rem;
   font-weight: 500;
   text-transform: uppercase;
 }
 
 .status-confirmed {
-  background-color: rgba(76, 175, 80, 0.1);
+  background-color: #2d4a2d;
   color: #4caf50;
-  border: 1px solid rgba(76, 175, 80, 0.3);
+  border: 1px solid #4caf50;
 }
 
 .status-pending {
-  background-color: rgba(255, 152, 0, 0.1);
+  background-color: #4a3d2d;
   color: #ff9800;
-  border: 1px solid rgba(255, 152, 0, 0.3);
+  border: 1px solid #ff9800;
 }
 
 .status-cancelled {
-  background-color: rgba(244, 67, 54, 0.1);
+  background-color: #4a2d2d;
   color: #f44336;
-  border: 1px solid rgba(244, 67, 54, 0.3);
+  border: 1px solid #f44336;
 }
 
 .booking-time {
@@ -122,7 +116,7 @@
   justify-content: space-between;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid #333;
 }
 
 .booking-time-item {
@@ -152,7 +146,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #333;
+  background-color: #333;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -180,10 +174,60 @@
 .booking-duration {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid #333;
   color: #90caf9;
   font-size: 0.9rem;
   text-align: right;
+}
+
+.booking-addresses {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #333;
+}
+
+.booking-address-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.booking-address-item:last-child {
+  margin-bottom: 0;
+}
+
+.booking-address-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+
+.booking-address-content {
+  flex: 1;
+}
+
+.booking-address-label {
+  color: #aaa;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.booking-address-value {
+  color: #e0e0e0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 .no-bookings {
@@ -204,31 +248,31 @@
 }
 
 .bookings-error {
-  background-color: rgba(244, 67, 54, 0.1);
+  background-color: #2d1b1b;
   border-left: 4px solid #f44336;
   color: #ff7961;
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 6px;
   margin: 1rem 0;
 }
 
-/* Responsive Design */
+/* Simple responsive design */
 @media (max-width: 768px) {
   .bookings-modal {
     width: 95%;
   }
-  
+
   .booking-time {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .booking-time-item {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
   }
-  
+
   .booking-time-label {
     margin-bottom: 0;
   }
