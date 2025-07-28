@@ -18,6 +18,12 @@ public class BookingRequest {
     @NotBlank(message =  "end time  needed")
     private LocalDateTime endTime;
 
+    @NotBlank(message =  "starting address  needed")
+    private String startingAddress;
+
+    @NotBlank(message =  "ending address  needed")
+    private String endingAddress;
+
 
 
 }

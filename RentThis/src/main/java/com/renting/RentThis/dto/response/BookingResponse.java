@@ -21,6 +21,9 @@ public class BookingResponse {
     private String paymentMethod;
     private long phoneNumber;
 
+    private String startingAddress;
+    private String endingAddress;
+
 
 
 }

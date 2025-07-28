@@ -143,6 +143,8 @@ public class BookingService {
                         .vehicle(ResponseMapper.toVehicleMap(booking.getVehicle()))
                         .bookedUser(ResponseMapper.toUserMap(booking.getUser()))
                         .paymentMethod(booking.getPaymentMethod())
+                        .startingAddress(booking.getStartingAddress())
+                        .endingAddress(booking.getEndingAddress())
                         .status(booking.getStatus())
                         .build())
                 .collect(Collectors.toList());
@@ -165,6 +167,8 @@ public class BookingService {
                         .endDate(booking.getEndTime())
                         .phoneNumber(booking.getUser().getPhoneNumber())
                         .bookedUser(ResponseMapper.toUserMap(booking.getUser()))
+                        .startingAddress(booking.getStartingAddress())
+                        .endingAddress(booking.getEndingAddress())
                         .status(booking.getStatus())
                         .build())
                 .collect(Collectors.toList());
@@ -214,7 +218,9 @@ public class BookingService {
                 vehicle.getId(),
                 request.getStartTime().toString(),
                 request.getEndTime().toString(),
-                10 // token valid for 10 minutes
+                10,
+                request.getStartingAddress(),
+                request.getEndingAddress()
         );
         return BookingVerificationResponse.builder()
                 .token(token)
@@ -231,6 +237,8 @@ public class BookingService {
         Long vehicleId = Long.parseLong(claims.get("vehicleId").toString());
         LocalDateTime startTime = LocalDateTime.parse(claims.get("startTime").toString());
         LocalDateTime endTime = LocalDateTime.parse(claims.get("endTime").toString());
+        String startingAddress = claims.get("startingAddress").toString();
+        String endingAddress = claims.get("endingAddress").toString();
 
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Vehicle not found"));
@@ -259,6 +267,8 @@ public class BookingService {
         booking.setEndTime(endTime);
         booking.setStatus("Confirmed");
         booking.setPaymentMethod("Internal");
+        booking.setStartingAddress(startingAddress);
+        booking.setEndingAddress(endingAddress);
 
         Booking saved = bookingRespository.save(booking);
 
