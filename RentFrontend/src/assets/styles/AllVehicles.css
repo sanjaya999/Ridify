@@ -243,3 +243,21 @@
     font-size: 1.6rem;
   }
 }
+
+.list-button {
+  background-color: #28a745; /* Green */
+  color: white;
+}
+
+.list-button:hover {
+  background-color: #218838;
+}
+
+.unlist-button {
+  background-color: #dc3545; /* Red */
+  color: white;
+}
+
+.unlist-button:hover {
+  background-color: #c82333;
+}
