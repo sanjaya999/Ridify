@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 @Service
 public class IntervalSchedulingService {
 
-    // TimeSlot class remains the same...
     public static class TimeSlot {
         private final LocalDateTime start;
         private final LocalDateTime end;
@@ -40,7 +39,6 @@ public class IntervalSchedulingService {
         }
     }
 
-    // findOverlappingSlots remains the same...
     public List<TimeSlot> findOverlappingSlots(List<Booking> existingBookings,
                                                LocalDateTime requestedStart,
                                                LocalDateTime requestedEnd) {

@@ -34,3 +34,8 @@ build/
 
 application.properties
 .idea/
+Dockerfile
+docker-compose.yml
+.codebuddy
+.idea
+target
