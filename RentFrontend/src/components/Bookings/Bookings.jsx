@@ -141,7 +141,7 @@ const Bookings = () => {
                         <strong>Plate Number:</strong> {booking.vehicle.plateNum}
                       </Typography>
                       <Typography variant="body2" color="#ccc" sx={{ mb: 1 }}>
-                        <strong>Price:</strong> ${booking.vehicle.price}/day
+                        <strong>Price:</strong> Rs{booking.vehicle.price}/day
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>

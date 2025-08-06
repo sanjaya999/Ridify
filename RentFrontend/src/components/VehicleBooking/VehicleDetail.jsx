@@ -243,7 +243,7 @@ const VehicleDetail = () => {
             <div className="vehicle-specs">
               <p><strong>Model:</strong> {vehicle.model || 'N/A'}</p>
               <p><strong>Plate Number:</strong> {vehicle.plateNum || 'N/A'}</p>
-              <p><strong>Price:</strong> ${vehicle.price ? vehicle.price.toFixed(2) : 'N/A'}/day</p>
+              <p><strong>Price:</strong> Rs{vehicle.price ? vehicle.price.toFixed(2) : 'N/A'}/day</p>
               <p><strong>Type:</strong> {vehicle.type || 'N/A'}</p>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { get } from '../api/api';
+import { get , put } from '../api/api';
 import { Link } from 'react-router-dom';
 import VehicleBookings from '../components/VehicleBookings';
 import '../assets/styles/AllVehicles.css';
@@ -32,6 +32,44 @@ const AllVehicles = () => {
     fetchVehicles();
   }, []);
 
+  const handleUnlist = async (vehicleId) => {
+    console.log(vehicleId);
+    // if (!window.confirm("Are you sure you want to unlist this vehicle?")) return;
+
+    try {
+      const response = await put(`/vehicles/unlist?vehicleId=${vehicleId}`);
+
+
+      if (response.success) {
+        alert("Vehicle unlisted successfully!");
+        setVehicles(prev => prev.filter(v => v.id !== vehicleId)); // Optionally remove from UI
+      } else {
+        alert(response.message || "Failed to unlist vehicle.");
+      }
+    } catch (error) {
+      console.error("Unlist error:", error);
+      alert("Something went wrong. Please try again.");
+    }
+  };
+  async function handleList(id) {
+
+    try {
+      const response = await put(`/vehicles/listVehicle?vehicleId=${id}`);
+
+
+      if (response.success) {
+        alert("Vehicle list successfully!");
+        setVehicles(prev => prev.filter(v => v.id !== id)); // Optionally remove from UI
+      } else {
+        alert(response.message || "Failed to list vehicle.");
+      }
+    } catch (error) {
+      console.error("list error:", error);
+      alert("Something went wrong. Please try again.");
+    }
+  }
+
+
   // Format price with commas and currency
   const formatPrice = (price) => {
     return `Rs. ${Number(price).toLocaleString()}`;
@@ -52,6 +90,8 @@ const AllVehicles = () => {
   const handleCloseBookings = () => {
     setSelectedVehicle(null);
   };
+
+
 
   return (
     <div className="all-vehicles-container">
@@ -133,9 +173,18 @@ const AllVehicles = () => {
                   >
                     View Bookings
                   </button>
-                  <button className="vehicle-action-button delete-button">
-                    Delete
-                  </button>
+                  {!(vehicle._listed) ? <button className="vehicle-action-button suspend-button"
+                                                onClick={() => handleList(vehicle.id)}
+                                                style={{backgroundColor: 'green', color: 'white'}}>List</button> :
+                      <button
+                          className="vehicle-action-button unlist-button"
+                          onClick={() => handleUnlist(vehicle.id)}
+                          style={{backgroundColor: 'red', color: 'white'}}
+                      >
+                        Unlist
+                      </button>}
+
+
                 </div>
               </div>
             </div>
