@@ -21,6 +21,7 @@ public class VehicleResponse {
     private double latitude;
     private double longitude;
     private boolean isSuspended;
+    private boolean is_listed;
 
 
 }

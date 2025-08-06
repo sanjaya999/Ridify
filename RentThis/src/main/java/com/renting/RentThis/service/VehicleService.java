@@ -35,6 +35,10 @@ public class VehicleService {
     private VehicleRepository vehicleRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
+
+
 
     @PreAuthorize("hasRole('admin')") //not working ??
     public VehicleResponse addVehicle(VehicleRequest request, MultipartFile photo){
@@ -80,7 +84,7 @@ public class VehicleService {
         List<Vehicle> vehicles = vehicleRepository.findAll();
 
         List<VehicleResponse> responseList = vehicles.stream()
-                .filter(vehicle -> !vehicle.isSuspended())
+                .filter(vehicle -> !vehicle.isSuspended() && vehicle.is_listed())
                 .map(vehicle -> VehicleResponse.builder()
                         .id(vehicle.getId())
                         .name(vehicle.getName())
@@ -102,6 +106,9 @@ public class VehicleService {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Vehicle not found with id: " + id));
 
+        if (vehicle.isSuspended() || !vehicle.is_listed()) {
+            throw new EntityNotFoundException("Vehicle not found with id: " + id);
+        }
         return VehicleResponse.builder()
                 .id(vehicle.getId())
                 .name(vehicle.getName())
@@ -112,6 +119,7 @@ public class VehicleService {
                 .photoUrl(vehicle.getPhotoUrl())
                 .ownerName(ResponseMapper.toUserMap(vehicle.getOwner()))
                 .build();
+
     }
 
 
@@ -155,6 +163,8 @@ public class VehicleService {
                         .price(vehicle.getPrice())
                         .plateNum(vehicle.getPlate_num())
                         .photoUrl(vehicle.getPhotoUrl())
+                        .isSuspended(vehicle.isSuspended())
+                        .is_listed(vehicle.is_listed())
                         .ownerName(ResponseMapper.toUserMap(vehicle.getOwner()))
                         .build())
                 .collect(Collectors.toList());
@@ -213,6 +223,45 @@ public class VehicleService {
                 .collect(Collectors.toList());
     }
 
+    @PreAuthorize("@userSecurity.isVehicleOwner(#vehicleId)")
+    public VehicleResponse unList(Long vehicleId) {
+
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + vehicleId));
+
+        vehicle.set_listed(false);
+        vehicleRepository.save(vehicle);
+
+        return VehicleResponse.builder()
+                .id(vehicle.getId())
+                .name(vehicle.getName())
+                .model(vehicle.getModel())
+                .is_listed(vehicle.is_listed())
+                .build();
+    }
+
+
+    @PreAuthorize("@userSecurity.isVehicleOwner(#vehicleId)")
+    public VehicleResponse listVehicle(Long vehicleId) {
+
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + vehicleId));
+
+        vehicle.set_listed(true);
+        vehicleRepository.save(vehicle);
+
+        return VehicleResponse.builder()
+                .id(vehicle.getId())
+                .name(vehicle.getName())
+                .model(vehicle.getModel())
+                .type(vehicle.getType())
+                .plateNum(vehicle.getPlate_num())
+                .price(vehicle.getPrice())
+                .photoUrl(vehicle.getPhotoUrl())
+                .isSuspended(vehicle.isSuspended())
+                .is_listed(vehicle.is_listed())
+                .build();
+    }
 
 
 
