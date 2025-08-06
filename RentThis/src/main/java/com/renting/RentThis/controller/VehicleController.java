@@ -117,5 +117,30 @@ public class VehicleController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/unlist")
+    public ResponseEntity<ApiResponse<VehicleResponse>> unlistVehicle(@RequestParam("vehicleId") Long vehicleId) {
+        VehicleResponse vehicleResponse = vehicleService.unList(vehicleId);
+
+        return ResponseEntity.ok(ApiResponse.<VehicleResponse>builder()
+                .success(true)
+                .status(200)
+                .data(vehicleResponse)
+                .message("Vehicle has been unlisted successfully")
+                .build());
+    }
+
+    @PutMapping("/listVehicle")
+    public ResponseEntity<ApiResponse<VehicleResponse>> listVehicle(@RequestParam("vehicleId") Long vehicleId) {
+        VehicleResponse vehicleResponse = vehicleService.listVehicle(vehicleId);
+
+        return ResponseEntity.ok(ApiResponse.<VehicleResponse>builder()
+                .success(true)
+                .status(200)
+                .data(vehicleResponse)
+                .message("Vehicle has been listed successfully")
+                .build());
+    }
+
+
 
 }

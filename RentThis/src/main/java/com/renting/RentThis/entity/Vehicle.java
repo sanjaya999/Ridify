@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "vehicle")
 @Data
-public class Vehicle {
+public class Vehicle  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
@@ -37,4 +37,6 @@ public class Vehicle {
     private double longitude;
 
     private  boolean isSuspended = false;
+
+    private boolean is_listed = true;
 }
