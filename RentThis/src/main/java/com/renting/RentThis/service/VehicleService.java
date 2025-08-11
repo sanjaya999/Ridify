@@ -2,11 +2,14 @@ package com.renting.RentThis.service;
 
 import com.renting.RentThis.dto.request.VehicleRequest;
 import com.renting.RentThis.dto.response.VehicleResponse;
+import com.renting.RentThis.entity.Booking;
 import com.renting.RentThis.entity.User;
 import com.renting.RentThis.entity.Vehicle;
+import com.renting.RentThis.repository.BookingRespository;
 import com.renting.RentThis.repository.UserRepository;
 import com.renting.RentThis.repository.VehicleRepository;
 import com.renting.RentThis.util.Geo;
+import com.renting.RentThis.util.IntervalSchedulingService;
 import com.renting.RentThis.util.ResponseMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.swing.text.html.Option;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.List;
@@ -37,7 +41,10 @@ public class VehicleService {
     private UserRepository userRepository;
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private BookingRespository bookingRespository;
+    @Autowired
+    private IntervalSchedulingService intervalSchedulingService;
 
 
     @PreAuthorize("hasRole('admin')") //not working ??
@@ -194,32 +201,31 @@ public class VehicleService {
     public List<VehicleResponse> getNearestVehicles(double userLat, double userLon) {
         List<Vehicle> vehicles = vehicleRepository.findAll();
 
+        System.out.println("=== DEBUGGING ===");
+        System.out.println("User coords: " + userLat + ", " + userLon);
+        System.out.println("Total vehicles: " + vehicles.size());
+
+        // Check each vehicle without any filtering
+        vehicles.forEach(v -> {
+            double distance = Geo.haversine(userLat, userLon, v.getLatitude(), v.getLongitude());
+            System.out.println("Vehicle: " + v.getName() +
+                    " | DB coords: (" + v.getLatitude() + ", " + v.getLongitude() + ")" +
+                    " | Distance: " + distance + " km" +
+                    " | Zero coords: " + (v.getLatitude() == 0.0 && v.getLongitude() == 0.0));
+        });
+
+        // Return ALL vehicles temporarily (remove all filters)
         return vehicles.stream()
-                // Exclude vehicles with invalid coordinates
-                .filter(v -> !(v.getLatitude() == 0.0 && v.getLongitude() == 0.0))
-                // Calculate distance
-                .map(vehicle -> {
-                    double distance = Geo.haversine(userLat, userLon, vehicle.getLatitude(), vehicle.getLongitude());
-                    return new AbstractMap.SimpleEntry<>(vehicle, distance);
-                })
-                // Filter for distance ≤ 3 km
-                .filter(entry -> entry.getValue() <= 3.0)
-                // Sort by distance ascending (optional)
-                .sorted(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))
-                // Map to VehicleResponse DTO
-                .map(entry -> {
-                    Vehicle vehicle = entry.getKey();
-                    return VehicleResponse.builder()
-                            .id(vehicle.getId())
-                            .name(vehicle.getName())
-                            .model(vehicle.getModel())
-                            .type(vehicle.getType())
-                            .plateNum(vehicle.getPlate_num())
-                            .price(vehicle.getPrice())
-                            .photoUrl(vehicle.getPhotoUrl())
-                            .ownerName(ResponseMapper.toUserMap(vehicle.getOwner()))
-                            .build();
-                })
+                .map(vehicle -> VehicleResponse.builder()
+                        .id(vehicle.getId())
+                        .name(vehicle.getName())
+                        .model(vehicle.getModel())
+                        .type(vehicle.getType())
+                        .plateNum(vehicle.getPlate_num())
+                        .price(vehicle.getPrice())
+                        .photoUrl(vehicle.getPhotoUrl())
+                        .ownerName(ResponseMapper.toUserMap(vehicle.getOwner()))
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -263,6 +269,62 @@ public class VehicleService {
                 .build();
     }
 
+    public List<VehicleResponse> getAvailableVehicles(double userLat, double userLon,
+                                                      LocalDateTime requestedStart,
+                                                      LocalDateTime requestedEnd) {
 
+        List<Vehicle> allVehicles = vehicleRepository.findAll();
+
+        // Filter active vehicles
+        List<Vehicle> activeVehicles = allVehicles.stream()
+                .filter(v -> !v.isSuspended() && v.is_listed())
+                .collect(Collectors.toList());
+
+        // Get nearby vehicles
+        List<Vehicle> nearbyVehicles = activeVehicles.stream()
+                .filter(v -> !(v.getLatitude() == 0.0 && v.getLongitude() == 0.0))
+                .map(vehicle -> {
+                    double distance = Geo.haversine(userLat, userLon, vehicle.getLatitude(), vehicle.getLongitude());
+                    return new AbstractMap.SimpleEntry<>(vehicle, distance);
+                })
+                .filter(entry -> entry.getValue() <= 10.0) // Within 10km (from debug version that worked)
+                .sorted(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))
+                .map(AbstractMap.SimpleEntry::getKey)
+                .collect(Collectors.toList());
+
+        // Filter available vehicles
+        List<Vehicle> availableVehicles = nearbyVehicles.stream()
+                .filter(vehicle -> isVehicleAvailable(vehicle.getId(), requestedStart, requestedEnd))
+                .collect(Collectors.toList());
+
+        return availableVehicles.stream()
+                .map(vehicle -> VehicleResponse.builder()
+                        .id(vehicle.getId())
+                        .name(vehicle.getName())
+                        .model(vehicle.getModel())
+                        .type(vehicle.getType())
+                        .plateNum(vehicle.getPlate_num())
+                        .price(vehicle.getPrice())
+                        .photoUrl(vehicle.getPhotoUrl())
+                        .ownerName(ResponseMapper.toUserMap(vehicle.getOwner()))
+                        .latitude(vehicle.getLatitude())
+                        .longitude(vehicle.getLongitude())
+                        .isSuspended(vehicle.isSuspended())
+                        .is_listed(vehicle.is_listed())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    private boolean isVehicleAvailable(Long vehicleId, LocalDateTime requestedStart, LocalDateTime requestedEnd) {
+        // Get all existing bookings for this vehicle
+        List<Booking> existingBookings = bookingRespository.findByVehicleId(vehicleId);
+
+        // Use the IntervalSchedulingService to check for overlaps
+        List<IntervalSchedulingService.TimeSlot> overlappingSlots =
+                intervalSchedulingService.findOverlappingSlots(existingBookings, requestedStart, requestedEnd);
+
+        // Vehicle is available if there are no overlapping bookings
+        return overlappingSlots.isEmpty();
+    }
 
 }
