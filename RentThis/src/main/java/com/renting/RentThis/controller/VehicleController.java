@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -140,6 +141,31 @@ public class VehicleController {
                 .message("Vehicle has been listed successfully")
                 .build());
     }
+
+    @PostMapping("/available")
+    public ResponseEntity<ApiResponse<List<VehicleResponse>>> getAvailableVehicles(
+            @RequestParam double latitude,
+            @RequestParam double longitude,
+            @RequestParam String startTime, // Format: "2025-01-15T10:00:00"
+            @RequestParam String endTime) {  // Format: "2025-01-15T16:00:00"
+
+        List<VehicleResponse> availableVehicles = vehicleService.getAvailableVehicles(
+                latitude, longitude,
+                LocalDateTime.parse(startTime),
+                LocalDateTime.parse(endTime)
+        );
+
+        ApiResponse<List<VehicleResponse>> response = ApiResponse.<List<VehicleResponse>>builder()
+                .success(true)
+                .status(200)
+                .data(availableVehicles)
+                .message("Available vehicles found for the requested time period")
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+
 
 
 
