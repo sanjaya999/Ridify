@@ -19,15 +19,7 @@ const getVehicle = async (id) => {
   }
 };
 
-// Verify booking availability
-const verifyBooking = async (bookingData) => {
-  try {
-    return await post('/api/v1/book/verify', bookingData);
-  } catch (error) {
-    console.error('Verify booking API error:', error);
-    throw error;
-  }
-};
+
 
 const VehicleDetail = () => {
   const { id } = useParams();
@@ -42,7 +34,16 @@ const VehicleDetail = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [startingAddress, setStartingAddress] = useState('');
   const [endingAddress, setEndingAddress] = useState('');
-
+  const [showGeo, setShowGeo] = useState();
+// Verify booking availability
+  const verifyBooking = async (bookingData) => {
+    try {
+      return await post('/api/v1/book/verify', bookingData);
+    } catch (error) {
+      console.error('Verify booking API error:', error);
+      throw error;
+    }
+  };
 
   // React Query Hooks
   const { data, isLoading, error: queryError } = useQuery({
@@ -166,6 +167,7 @@ const VehicleDetail = () => {
   };
 
   const handleBooking = () => {
+    setShowGeo(true);
     if (!startDateTime || !endDateTime || duration <= 0) {
       setErrorMessage('Please select a valid start and end time.');
       return;
@@ -354,8 +356,8 @@ const VehicleDetail = () => {
 
         {/* Nearest Vehicles Section - Now outside the grid container */}
 
+        {showGeo ? <GeoLocation startTime = {startDateTime} endTime = {endDateTime} /> : null}
 
-        <GeoLocation />
       </div>
   );
 };

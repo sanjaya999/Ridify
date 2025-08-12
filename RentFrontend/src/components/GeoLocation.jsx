@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { post } from "../api/api.js";
 import '../assets/styles/GeoLocation.css'; // Import the horizontal CSS
 
-function GeoLocation() {
+function GeoLocation(startTime , endTime) {
+    console.log("starttime: and endtime: ",startTime.startTime , startTime.endTime);
+
     const [nearestVehicles, setNearestVehicles] = useState([]);
     const [currentLocation, setCurrentLocation] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -36,7 +38,8 @@ function GeoLocation() {
             setError(null);
 
             try {
-                const url = `/vehicles/nearest?longitude=${currentLocation.longitude}&latitude=${currentLocation.latitude}`;
+                console.log("starting get request");
+                const url = `/vehicles/available?latitude=${currentLocation.latitude}&longitude=${currentLocation.longitude}&startTime=${startTime.startTime}&endTime=${startTime.endTime}`;
                 const response = await post(url);
 
                 if (response.success && response.data) {
