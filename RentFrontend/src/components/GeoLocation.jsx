@@ -1,38 +1,91 @@
 import React, { useEffect, useState } from 'react';
 import { post } from "../api/api.js";
-import '../assets/styles/GeoLocation.css'; // Import the horizontal CSS
+import '../assets/styles/GeoLocation.css';
+import {useNavigate} from "react-router-dom";
 
 function GeoLocation(startTime , endTime) {
     console.log("starttime: and endtime: ",startTime.startTime , startTime.endTime);
+    const navigate = useNavigate();
 
     const [nearestVehicles, setNearestVehicles] = useState([]);
     const [currentLocation, setCurrentLocation] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [isOnline, setIsOnline] = useState(navigator.onLine);
+    const [usingFallback, setUsingFallback] = useState(false);
+
+    const FALLBACK_LOCATION = {
+        latitude: 27.7172,
+        longitude: 85.3240
+    };
 
     useEffect(() => {
+
+        const handleOnline = () => setIsOnline(true);
+        const handleOffline = () => setIsOnline(false);
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!isOnline) {
+            console.log("Offline detected, using fallback location");
+            setCurrentLocation(FALLBACK_LOCATION);
+            setUsingFallback(true);
+            return;
+        }
+
         if ("geolocation" in navigator) {
+            // Add timeout to prevent hanging
+            const timeoutId = setTimeout(() => {
+                console.log("Geolocation timeout, using fallback location");
+                setCurrentLocation(FALLBACK_LOCATION);
+                setUsingFallback(true);
+            }, 10000); // 10 second timeout
+
             navigator.geolocation.getCurrentPosition(
                 (position) => {
+                    clearTimeout(timeoutId);
                     const coords = {
                         latitude: position.coords.latitude,
                         longitude: position.coords.longitude
                     };
                     setCurrentLocation(coords);
+                    setUsingFallback(false);
                 },
                 (error) => {
+                    clearTimeout(timeoutId);
                     console.error("Error getting location:", error);
-                    setError("Failed to get current location");
+                    console.log("Using fallback location due to geolocation error");
+                    setCurrentLocation(FALLBACK_LOCATION);
+                    setUsingFallback(true);
+                },
+                {
+                    timeout: 8000,
+                    enableHighAccuracy: false
                 }
             );
         } else {
-            setError("Geolocation is not supported by this browser");
+            console.log("Geolocation not supported, using fallback location");
+            setCurrentLocation(FALLBACK_LOCATION);
+            setUsingFallback(true);
         }
-    }, []);
+    }, [isOnline]);
 
     useEffect(() => {
         async function fetchNearestVehicles() {
             if (!currentLocation) return;
+
+            if (!isOnline) {
+                setError("You're offline. Please check your internet connection to see available vehicles.");
+                return;
+            }
 
             setLoading(true);
             setError(null);
@@ -49,19 +102,15 @@ function GeoLocation(startTime , endTime) {
                 }
             } catch (err) {
                 console.error("Error fetching nearest vehicles:", err);
-                setError("Failed to fetch nearest vehicles");
+                setError("Failed to fetch nearest vehicles. Please check your internet connection.");
             } finally {
                 setLoading(false);
             }
         }
 
         fetchNearestVehicles();
-    }, [currentLocation]);
+    }, [currentLocation, isOnline]);
 
-    const handleBookNow = (vehicleId) => {
-        // Handle booking logic here
-        console.log(`Booking vehicle with ID: ${vehicleId}`);
-    };
 
     if (error) {
         return (
@@ -69,6 +118,11 @@ function GeoLocation(startTime , endTime) {
                 <div className="error-container">
                     <h3>Error</h3>
                     <p>{error}</p>
+                    {!isOnline && (
+                        <p style={{ color: '#666', fontSize: '0.9em', marginTop: '10px' }}>
+                            You're currently offline. Connect to the internet to see available vehicles.
+                        </p>
+                    )}
                 </div>
             </div>
         );
@@ -79,6 +133,11 @@ function GeoLocation(startTime , endTime) {
             <div className="recommended-vehicles-container">
                 <div className="loading-container">
                     <p>Finding nearest vehicles...</p>
+                    {usingFallback && (
+                        <p style={{ color: '#666', fontSize: '0.9em' }}>
+                            Using approximate location
+                        </p>
+                    )}
                 </div>
             </div>
         );
@@ -89,7 +148,13 @@ function GeoLocation(startTime , endTime) {
             <div className="recommended-header">
                 <h2>Nearest Vehicles</h2>
                 {currentLocation && (
-                    <p>Based on your current location</p>
+                    <p>
+                        {usingFallback
+                            ? "Based on approximate location"
+                            : "Based on your current location"
+                        }
+                        {!isOnline && " (offline mode)"}
+                    </p>
                 )}
             </div>
 
@@ -137,12 +202,8 @@ function GeoLocation(startTime , endTime) {
                                     <p className="vehicle-price">
                                         Rs. {vehicle.price.toLocaleString()}/day
                                     </p>
-                                    <button
-                                        className="book-button"
-                                        onClick={() => handleBookNow(vehicle.id)}
-                                        disabled={vehicle.suspended}
-                                    >
-                                        {vehicle.suspended ? 'Unavailable' : 'Book Now'}
+                                    <button onClick={() => navigate(`/aboutVehicle/${vehicle.id}`)}>
+                                        Book Now
                                     </button>
                                 </div>
                             </div>

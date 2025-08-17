@@ -9,7 +9,6 @@ import GeoLocation from "../GeoLocation.jsx";
 
 const API_BASE_URL = 'http://localhost:8080';
 
-// Fetch single vehicle details
 const getVehicle = async (id) => {
   try {
     return await get(`/vehicles/getOne?id=${id}`);
@@ -60,16 +59,13 @@ const VehicleDetail = () => {
         setErrorMessage('');
         navigate('/confirm-booking', {
           state: {
-            // Existing data from backend verification
             hourlyRate: data.data.hourlyRate,
             totalHours: data.data.totalHours,
             totalAmount: data.data.totalAmount,
-            // === Add Vehicle details from the initial fetch ===
-            vehicleId: vehicle.id, // Pass ID if needed for Khalti metadata
+            vehicleId: vehicle.id,
             vehicleName: vehicle.name,
             vehicleModel: vehicle.model,
             vehiclePhotoUrl: vehicle.photoUrl
-            // =================================================
           }
         });
       } else if (data?.message) {
@@ -87,7 +83,6 @@ const VehicleDetail = () => {
     }
   });
 
-  // Calculate duration when dates change
   useEffect(() => {
     if (startDateTime && endDateTime) {
       const start = new Date(startDateTime);
@@ -103,11 +98,9 @@ const VehicleDetail = () => {
       setDuration(0);
     }
     
-    // Clear error messages when date/time changes
     setErrorMessage('');
   }, [startDateTime, endDateTime]);
 
-  // Helper Functions
   const formatDateTime = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -198,7 +191,6 @@ const VehicleDetail = () => {
     bookingMutation.mutate(bookingData);
   };
 
-  // Parse and format alternative availability times
   const formatAvailabilityMessage = (message) => {
     if (!message || !message.includes('Nearby availability:')) return message;
     
@@ -221,7 +213,6 @@ const VehicleDetail = () => {
     );
   };
 
-  // Render Logic
   if (isLoading) return <p>Loading vehicle details...</p>;
   if (queryError) return <p>Error loading vehicle: {queryError.response.data.message}</p>;
   if (!data || !data.data) return <p>Vehicle not found.</p>;
@@ -354,7 +345,6 @@ const VehicleDetail = () => {
           </div>
         </div>
 
-        {/* Nearest Vehicles Section - Now outside the grid container */}
 
         {showGeo ? <GeoLocation startTime = {startDateTime} endTime = {endDateTime} /> : null}
 
