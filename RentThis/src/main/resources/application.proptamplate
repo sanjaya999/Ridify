@@ -20,6 +20,9 @@ jwt.access.expiration=886400000
 jwt.refresh.secret=Secret
 jwt.refresh.expiration=1504800000
 
+khaltiSecretKey=fds984fds98f4d9s84f98d4fd54fd65465df465f98d498f4df44d5df
+khaltiPublicKey=df65d4f65d4f65d46f546d5s4f654dfa98e4r6546df465sd4df65d4f
+callbackURL = http://localhost:3000
 
 spring.web.resources.static-locations=file:uploads/
 spring.servlet.multipart.enabled=true
