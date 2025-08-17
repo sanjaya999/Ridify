@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Main API client that includes the auth header
 const apiClient = axios.create({
-    baseURL: "http://localhost:8080",
+    baseURL: `${import.meta.env.VITE_API_URL}`,
 });
 
 // A separate, clean Axios instance for the refresh token call
