@@ -44,12 +44,9 @@ public class IntervalSchedulingService {
                                                LocalDateTime requestedEnd) {
         List<TimeSlot> overlaps = new ArrayList<>();
         for (Booking booking : existingBookings) {
-            // --- CORRECTED Condition ---
-            // Overlap exists if request starts BEFORE booking ends
-            // AND request ends AFTER booking starts.
+
             if (requestedStart.isBefore(booking.getEndTime()) &&
                     requestedEnd.isAfter(booking.getStartTime())) {
-                // Add the existing booking's timeslot to indicate what is conflicting
                 overlaps.add(new TimeSlot(booking.getStartTime(), booking.getEndTime()));
             }
         }
@@ -69,15 +66,13 @@ public class IntervalSchedulingService {
     public List<TimeSlot> findAvailableTimeSlots(List<Booking> existingBookings,
                                                  LocalDateTime requestedStart,
                                                  LocalDateTime requestedEnd) {
-        // Sort bookings by start time
         List<Booking> sortedBookings = existingBookings.stream()
                 .sorted((b1, b2) -> b1.getStartTime().compareTo(b2.getStartTime()))
-                .toList(); // Or .collect(Collectors.toList()) if using older Java
+                .toList();
 
         List<TimeSlot> availableSlots = new ArrayList<>();
 
         if (sortedBookings.isEmpty()) {
-            // No bookings, check if the entire requested time meets the minimum duration
             if (Duration.between(requestedStart, requestedEnd).toMinutes() >= 30) {
                 availableSlots.add(new TimeSlot(requestedStart, requestedEnd));
             }
@@ -88,7 +83,6 @@ public class IntervalSchedulingService {
 
         for (Booking booking : sortedBookings) {
             if (currentTime.isBefore(booking.getStartTime())) {
-                // Potential slot found, add it for now (will be filtered later)
                 availableSlots.add(new TimeSlot(currentTime, booking.getStartTime()));
             }
             if (currentTime.isBefore(booking.getEndTime())) {
@@ -97,24 +91,18 @@ public class IntervalSchedulingService {
         }
 
         if (currentTime.isBefore(requestedEnd)) {
-            // Potential slot found, add it for now (will be filtered later)
             availableSlots.add(new TimeSlot(currentTime, requestedEnd));
         }
 
-        // Define the minimum duration required
         final long MINIMUM_DURATION_MINUTES = 30;
 
-        // Filter the generated slots
         return availableSlots.stream()
-                // 1. Ensure start is strictly before end (prevents zero-length slots)
                 .filter(slot -> slot.getStart().isBefore(slot.getEnd()))
-                // 2. Ensure the duration is at least the minimum required minutes
                 .filter(slot -> Duration.between(slot.getStart(), slot.getEnd())
                         .toMinutes() >= MINIMUM_DURATION_MINUTES)
                 .collect(Collectors.toList());
     }
 
-    // formatTimeSlots remains the same...
     public String formatTimeSlots(List<TimeSlot> slots) {
         return slots.stream()
                 .map(TimeSlot::toString)

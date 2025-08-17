@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { get } from '../../api/api';
 import { format, parseISO } from 'date-fns';
 
-const Bookings = () => {
+const Booking = () => {
   const fetchVehicles = async () => {
     const { data } = await get(`api/v1/book/currentUserBooking`);
     return data;
@@ -141,7 +141,7 @@ const Bookings = () => {
                         <strong>Plate Number:</strong> {booking.vehicle.plateNum}
                       </Typography>
                       <Typography variant="body2" color="#ccc" sx={{ mb: 1 }}>
-                        <strong>Price:</strong> Rs{booking.vehicle.price}/day
+                        <strong>Price:</strong> Rs{booking.vehicle.price}/hour
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -188,4 +188,4 @@ const Bookings = () => {
   );
 };
 
-export default Bookings;
+export default Booking;

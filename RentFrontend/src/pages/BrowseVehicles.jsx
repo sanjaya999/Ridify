@@ -17,17 +17,13 @@ const BrowseVehicles = () => {
         setLoading(true);
         const response = await get('/vehicles/getAll');
         
-        // Check the structure of the response and extract the vehicles array
         if (response) {
-          // If response is an array, use it directly
           if (Array.isArray(response)) {
             setVehicles(response);
           } 
-          // If response has a data property that is an array, use that
           else if (response.data && Array.isArray(response.data)) {
             setVehicles(response.data);
           }
-          // If response is an object with success property (API might return {success: true, data: [...]}
           else if (response.success && Array.isArray(response.data)) {
             setVehicles(response.data);
           } else {
@@ -48,12 +44,10 @@ const BrowseVehicles = () => {
     fetchAllVehicles();
   }, []);
 
-  // Format price with commas and currency
   const formatPrice = (price) => {
     return `Rs. ${Number(price).toLocaleString()}`;
   };
 
-  // Handle image error
   const handleImageError = (e) => {
     e.target.style.display = 'none';
     e.target.nextSibling.style.display = 'block';
@@ -69,12 +63,10 @@ const BrowseVehicles = () => {
   return (
     <div className="browse-vehicles-container">
       <div className="browse-header">
-        <h1>Browse All Vehicles</h1>
-        <p>Find the perfect vehicle for your next journey</p>
       </div>
 
       {/* Vehicles Grid */}
-      <div className="vehicles-content">
+      <div className="vehicles-content">`
         {loading ? (
           <div className="loading-container">
             <p>Loading vehicles...</p>
