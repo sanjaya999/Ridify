@@ -1,6 +1,5 @@
 package com.renting.RentThis.config;
 
-//import com.renting.RentThis.filter.CustomAuthenticationEntryPoint;
 import com.renting.RentThis.filter.CustomAuthenticationEntryPoint;
 import com.renting.RentThis.filter.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -41,10 +40,10 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/v1/users/**").permitAll()
                             .requestMatchers("/vehicles/**").permitAll()
                             .requestMatchers("/api/v1/book/verify").authenticated()
-                            .requestMatchers("/api/v1/book/**").permitAll()                            .requestMatchers("/uploads/**").permitAll()
+                            .requestMatchers("/api/v1/book/**").permitAll()
+                            .requestMatchers("/uploads/**").permitAll()
                             .requestMatchers("/api/v1/payments/khaltiCall/callback").permitAll()
                             .requestMatchers("/api/v1/auth/refresh").permitAll()
-                            // OPTIONS requests will be handled by the cors configuration above
                             .anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -59,23 +58,17 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173" , "http://localhost:3000"));
 
 
-        // Allowed Methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 
-        // Allowed Headers
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type" ));
-
-        // IMPORTANT: Allow Credentials - Necessary for sending cookies or Authorization headers
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 
-        // Expose Headers (Optional) - If your frontend needs to read response headers like Location or custom ones
-        // configuration.setExposedHeaders(List.of("Authorization", "Location"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Apply this configuration to all paths
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
