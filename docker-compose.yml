@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  database:
+    image: postgres:15
+    container_name: ridify-db
+    environment:
+      POSTGRES_DB: ridify
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 2445
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ridify_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ridify"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./RentThis
+      dockerfile: Dockerfile
+    container_name: rentthis-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/ridify
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 2445
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - ridify_network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./RentFrontend
+      dockerfile: Dockerfile
+    container_name: rentthis-frontend
+    # environment:
+    #   - REACT_APP_API_URL=http://localhost:8080
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - ridify_network
+    restart: unless-stopped
+
+networks:
+  ridify_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
