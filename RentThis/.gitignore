@@ -39,3 +39,4 @@ docker-compose.yml
 .codebuddy
 .idea
 target
+/uploads
