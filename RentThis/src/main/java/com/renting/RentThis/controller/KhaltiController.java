@@ -12,6 +12,7 @@ import com.renting.RentThis.service.*;
 import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/payments")
 public class KhaltiController {
+
+    @Value("${callbackURL}")
+    private String callbackURL;
 
     private static final Logger log = LoggerFactory.getLogger(KhaltiController.class);
 
@@ -76,7 +80,7 @@ public class KhaltiController {
         Long vehicleOwnerId = vehicle.getOwner().getId();
         Long currentUserId = currentUser.getId();
 
-        String returnUrl = "http://localhost:3000/khalti-callback";
+        String returnUrl =  callbackURL + "/khalti-callback";
         String customerName = currentUser.getName();
         String customerEmail = currentUser.getEmail();
         String cusotmerPhone = "1234567891";
@@ -98,7 +102,7 @@ public class KhaltiController {
 
         String topupid = "top" + currentUser.getId() + "-" + amountToTopup;
 
-        String returnUrl = "http://localhost:3000/topup-callback";
+        String returnUrl = callbackURL + "/topup-callback";
         String customerName = currentUser.getName();
         String customerEmail = currentUser.getEmail();
         String cusotmerPhone = "1234567891";
