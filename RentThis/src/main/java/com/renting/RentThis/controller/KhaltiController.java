@@ -76,7 +76,7 @@ public class KhaltiController {
         Long vehicleOwnerId = vehicle.getOwner().getId();
         Long currentUserId = currentUser.getId();
 
-        String returnUrl = "http://localhost:5173/khalti-callback";
+        String returnUrl = "http://localhost:3000/khalti-callback";
         String customerName = currentUser.getName();
         String customerEmail = currentUser.getEmail();
         String cusotmerPhone = "1234567891";
@@ -98,7 +98,7 @@ public class KhaltiController {
 
         String topupid = "top" + currentUser.getId() + "-" + amountToTopup;
 
-        String returnUrl = "http://localhost:5173/topup-callback";
+        String returnUrl = "http://localhost:3000/topup-callback";
         String customerName = currentUser.getName();
         String customerEmail = currentUser.getEmail();
         String cusotmerPhone = "1234567891";
@@ -164,22 +164,16 @@ public class KhaltiController {
         }
 
         try {
-            // --- Call the service method that verifies with Khalti server-side ---
-            // This uses your secret key.
             Map<String, Object> verificationResponse = paymentService.verifyKhaltiPayment(pidx , token);
 
-            // --- Return Khalti's verification response directly to the frontend ---
-            // The frontend will inspect the 'status', 'total_amount' etc. from this response
             log.info("Returning Khalti verification status for pidx {}: {}", pidx, verificationResponse.get("status"));
             return ResponseEntity.ok(verificationResponse);
 
         } catch (RuntimeException e) {
-            // Catch errors from the paymentService call (e.g., communication failure with Khalti)
             log.error("Khalti status check failed for pidx {} due to runtime exception: {}", pidx, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to verify Khalti payment status due to an internal error.", "pidx", pidx));
         } catch (Exception e) {
-            // Catch any other unexpected errors
             log.error("Unexpected error during Khalti status check for pidx {}: {}", pidx, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "An unexpected error occurred while checking payment status.", "pidx", pidx));
@@ -192,28 +186,21 @@ public class KhaltiController {
 
         log.info("Received Khalti status check request for pidx: {}", pidx);
 
-        // Basic input validation
         if (pidx == null || pidx.isBlank()) {
             log.warn("Status check request missing pidx.");
             return ResponseEntity.badRequest().body(Map.of("message", "Missing pidx for status check."));
         }
 
         try {
-            // --- Call the service method that verifies with Khalti server-side ---
-            // This uses your secret key.
             TransactionResponse verificationResponse = paymentService.khaltiTopup(pidx );
 
-            // --- Return Khalti's verification response directly to the frontend ---
-            // The frontend will inspect the 'status', 'total_amount' etc. from this response
             return ResponseEntity.ok(verificationResponse);
 
         } catch (RuntimeException e) {
-            // Catch errors from the paymentService call (e.g., communication failure with Khalti)
             log.error("Khalti status check failed for pidx {} due to runtime exception: {}", pidx, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "Failed to verify Khalti payment status due to an internal error.", "pidx", pidx));
         } catch (Exception e) {
-            // Catch any other unexpected errors
             log.error("Unexpected error during Khalti status check for pidx {}: {}", pidx, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", "An unexpected error occurred while checking payment status.", "pidx", pidx));
