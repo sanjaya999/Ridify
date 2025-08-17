@@ -55,7 +55,7 @@ public class VehicleController {
             @ModelAttribute VehicleRequest request,
             @RequestParam("id") Long id) {
 
-        VehicleResponse vehicle = vehicleService.getOneVehicle(id);  // Return single object, not a list
+        VehicleResponse vehicle = vehicleService.getOneVehicle(id);
 
         return ResponseEntity.ok(ApiResponse.<VehicleResponse>builder()
                 .success(true)
@@ -146,8 +146,8 @@ public class VehicleController {
     public ResponseEntity<ApiResponse<List<VehicleResponse>>> getAvailableVehicles(
             @RequestParam double latitude,
             @RequestParam double longitude,
-            @RequestParam String startTime, // Format: "2025-01-15T10:00:00"
-            @RequestParam String endTime) {  // Format: "2025-01-15T16:00:00"
+            @RequestParam String startTime,
+            @RequestParam String endTime) {
 
         List<VehicleResponse> availableVehicles = vehicleService.getAvailableVehicles(
                 latitude, longitude,

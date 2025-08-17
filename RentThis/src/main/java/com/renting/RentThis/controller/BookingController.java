@@ -77,7 +77,6 @@ public class BookingController {
                     .message("Time slot available")
                     .build());
         } catch (ResponseStatusException ex) {
-            // Handle the conflict status exception specifically
             if (ex.getStatusCode() == HttpStatus.CONFLICT) {
                 return ResponseEntity
                         .status(HttpStatus.CONFLICT)

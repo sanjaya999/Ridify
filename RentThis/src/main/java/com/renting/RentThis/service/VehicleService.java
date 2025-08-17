@@ -214,7 +214,6 @@ public class VehicleService {
                     " | Zero coords: " + (v.getLatitude() == 0.0 && v.getLongitude() == 0.0));
         });
 
-        // Return ALL vehicles temporarily (remove all filters)
         return vehicles.stream()
                 .map(vehicle -> VehicleResponse.builder()
                         .id(vehicle.getId())
@@ -275,7 +274,6 @@ public class VehicleService {
 
         List<Vehicle> allVehicles = vehicleRepository.findAll();
 
-        // Filter active vehicles
         List<Vehicle> activeVehicles = allVehicles.stream()
                 .filter(v -> !v.isSuspended() && v.is_listed())
                 .collect(Collectors.toList());
@@ -287,12 +285,12 @@ public class VehicleService {
                     double distance = Geo.haversine(userLat, userLon, vehicle.getLatitude(), vehicle.getLongitude());
                     return new AbstractMap.SimpleEntry<>(vehicle, distance);
                 })
-                .filter(entry -> entry.getValue() <= 10.0) // Within 10km (from debug version that worked)
+                .filter(entry -> entry.getValue() <= 10.0)
                 .sorted(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))
                 .map(AbstractMap.SimpleEntry::getKey)
                 .collect(Collectors.toList());
 
-        // Filter available vehicles
+
         List<Vehicle> availableVehicles = nearbyVehicles.stream()
                 .filter(vehicle -> isVehicleAvailable(vehicle.getId(), requestedStart, requestedEnd))
                 .collect(Collectors.toList());
@@ -316,14 +314,11 @@ public class VehicleService {
     }
 
     private boolean isVehicleAvailable(Long vehicleId, LocalDateTime requestedStart, LocalDateTime requestedEnd) {
-        // Get all existing bookings for this vehicle
         List<Booking> existingBookings = bookingRespository.findByVehicleId(vehicleId);
 
-        // Use the IntervalSchedulingService to check for overlaps
         List<IntervalSchedulingService.TimeSlot> overlappingSlots =
                 intervalSchedulingService.findOverlappingSlots(existingBookings, requestedStart, requestedEnd);
 
-        // Vehicle is available if there are no overlapping bookings
         return overlappingSlots.isEmpty();
     }
 

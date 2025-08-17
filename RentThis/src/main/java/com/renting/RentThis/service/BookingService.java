@@ -189,8 +189,8 @@ public class BookingService {
         if (!overlappingSlots.isEmpty()) {
             List<IntervalSchedulingService.TimeSlot> availableSlots = intervalSchedulingService
                     .findAvailableTimeSlots(existingBooking,
-                            request.getStartTime().minusHours(6),
-                            request.getEndTime().plusHours(6));
+                            request.getStartTime(),
+                            request.getEndTime());
 
             String availableTimes = availableSlots.stream()
                     .map(slot -> String.format("%s - %s",
@@ -245,13 +245,11 @@ public class BookingService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        // ⛔ Check again if someone else booked in the meantime
         List<Booking> existingBookings = bookingRespository.findByVehicleId(vehicleId);
         if (!intervalSchedulingService.findOverlappingSlots(existingBookings, startTime, endTime).isEmpty()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Slot already booked");
         }
 
-        // ✅ Recalculate amount
         BigDecimal amount = calculateAmount(vehicle, startTime, endTime);
 
         try {
@@ -286,7 +284,7 @@ public class BookingService {
 
     public BigDecimal calculateAmount(Vehicle vehicle, LocalDateTime start, LocalDateTime end) {
         long hours = Duration.between(start, end).toHours();
-        if (hours == 0) hours = 1; // Minimum 1 hour
+        if (hours == 0) hours = 1;
         return vehicle.getPrice().multiply(BigDecimal.valueOf(hours));
     }
 
