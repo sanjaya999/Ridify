@@ -6,11 +6,11 @@ function Upload() {
   // State for form fields
   const [name, setName] = useState('');
   const [model, setModel] = useState('');
-  const [type, setType] = useState('scooter'); // Default or common value
+  const [type, setType] = useState('scooter');
   const [plateNum, setPlateNum] = useState('');
-  const [status, setStatus] = useState('available'); // Default or common value
+  const [status, setStatus] = useState('available');
   const [price, setPrice] = useState('');
-  const [photo, setPhoto] = useState(null); // State for the selected file
+  const [photo, setPhoto] = useState(null);
   const [location, setLocation] = useState(null)
 
   useEffect(() => {
@@ -26,14 +26,14 @@ function Upload() {
   }, []);
   // State for submission status
   const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState(''); // To show success/error messages
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
   // Handler for file input changes
   const handleFileChange = (event) => {
     if (event.target.files && event.target.files[0]) {
       setPhoto(event.target.files[0]);
-      setMessage(''); // Clear previous messages on new file selection
+      setMessage('');
       setError('');
     } else {
       setPhoto(null);
@@ -69,18 +69,17 @@ function Upload() {
     try {
       const response = await post('/vehicles/admin/add', formData);
 
-      if (!(response.status >= 200 && response.status < 300)) { // Check status code range
+      if (!(response.status >= 200 && response.status < 300)) {
         let errorMsg = `HTTP error! status: ${response.status}`;
         try {
-            const errData = response.data; // Error details might be in response.data
+            const errData = response.data;
             errorMsg = errData.message || JSON.stringify(errData) || errorMsg;
         } catch (e) {
             errorMsg = response.statusText || errorMsg;
         }
-        throw new Error(errorMsg); // Throw error to be caught below
+        throw new Error(errorMsg);
       }
 
-      // Success case
       const result = response.data; // Access the response body
       setMessage(result.message || 'Vehicle added successfully!');
       
@@ -98,9 +97,8 @@ function Upload() {
 
     } catch (err) {
       console.error("Submission failed:", err);
-      // Handle errors (err might be the Error thrown above or a network error)
       let detail = 'Failed to add vehicle. Please try again.';
-      if (err && err.data) { // Check if it has Axios response data (from thrown response errors)
+      if (err && err.data) {
           detail = err.data.message || JSON.stringify(err.data);
       } else if (err instanceof Error) {
           detail = err.message;

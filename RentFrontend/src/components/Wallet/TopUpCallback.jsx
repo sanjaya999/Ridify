@@ -4,7 +4,6 @@ import { useQuery as useReactQuery } from '@tanstack/react-query';
 import { post } from '../../api/api';
 import { Box, Typography, Paper, Container, CircularProgress, Alert, Button } from '@mui/material';
 
-// Utility to parse query params from URL
 function useUrlQuery() {
   return new URLSearchParams(useLocation().search);
 }
@@ -13,20 +12,16 @@ const TopUpCallback = () => {
   const urlQuery = useUrlQuery();
   const navigate = useNavigate();
 
-  // Extract params from the callback URL
   const pidx = urlQuery.get('pidx');
   const statusParam = urlQuery.get('status');
 
-  // Define the async function to verify the payment
   const verifyPayment = async (pidxToCheck) => {
     if (!pidxToCheck) {
       throw new Error('PIDX is required for verification.');
     }
-    // Call the check-status API endpoint with only the pidx parameter
     return await post('/api/v1/payments/khalti/topup/check-status', { pidx: pidxToCheck });
   };
 
-  // Use React Query to fetch verification status
   const {
     data: verificationData,
     isLoading,
@@ -195,18 +190,7 @@ const TopUpCallback = () => {
           >
             Go Home
           </Button>
-          <Button 
-            variant="contained" 
-            onClick={() => navigate('/profile')}
-            sx={{ 
-              backgroundColor: '#8c52ff',
-              '&:hover': {
-                backgroundColor: '#7440e0'
-              }
-            }}
-          >
-            View Profile
-          </Button>
+
         </Box>
       </Paper>
     </Container>

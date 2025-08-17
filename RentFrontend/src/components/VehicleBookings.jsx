@@ -44,14 +44,14 @@ const VehicleBookings = ({ vehicleId, vehicleName, onClose }) => {
   };
 
   // Calculate duration between two dates
-  const calculateDuration = (startDate, endDate) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const durationMs = end - start;
-    const hours = Math.floor(durationMs / (1000 * 60 * 60));
-    
-    return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
-  };
+  // const calculateDuration = (startDate, endDate) => {
+  //   const start = new Date(startDate);
+  //   const end = new Date(endDate);
+  //   const durationMs = end - start;
+  //   const hours = Math.floor(durationMs / (1000 * 60 * 60));
+  //
+  //   return `${hours} ${hours === 1 ? 'hour' : 'hours'}`;
+  // };
 
   // Get initials from name
   const getInitials = (name) => {

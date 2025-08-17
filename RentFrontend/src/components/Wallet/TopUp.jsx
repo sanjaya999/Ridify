@@ -11,7 +11,6 @@ const TopUp = () => {
   const [feedback, setFeedback] = useState('');
 
   const handleAmountChange = (e) => {
-    // Only allow positive numbers
     const value = e.target.value;
     if (value === '' || (/^\d+$/.test(value) && parseInt(value) > 0)) {
       setAmount(value);
@@ -20,7 +19,6 @@ const TopUp = () => {
   };
 
   const handleTopUp = async () => {
-    // Validate amount
     if (!amount || parseInt(amount) < 100) {
       setError('Please enter an amount of at least Rs. 100');
       return;
@@ -31,13 +29,10 @@ const TopUp = () => {
     setError('');
 
     try {
-      // Call the topup API
       const response = await post('/api/v1/payments/khalti/topup', { amount: parseInt(amount) });
       
-      // Check if the initiation was successful
       if (response && response.payment_url) {
         setFeedback('Redirecting to Khalti...');
-        // Redirect to Khalti payment page
         window.location.href = response.payment_url;
       } else {
         throw new Error(response?.message || 'Failed to initiate Khalti payment');

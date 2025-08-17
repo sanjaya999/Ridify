@@ -28,6 +28,18 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+      if (!/^\d{10}$/.test(formData.phoneNumber)) {
+          setError("Phone number must be exactly 10 digits");
+          return;
+      }
+      if (formData.password !== formData.confirmPassword) {
+          setError("Passwords do not match");
+          return;
+      }
+      if (formData.password.length < 6) {
+          setError("Password must be at least 6 characters");
+          return;
+      }
     setLoading(true);
     try {
       const response = await post('/api/v1/users/register', {
@@ -132,7 +144,7 @@ const Register = () => {
               }}
             >
               <option value="customer">Customer</option>
-              <option value="admin">Admin</option>
+              <option value="admin">Seller</option>
             </TextField>
           </div>
           <button type="submit" className="register-button" disabled={loading}>
