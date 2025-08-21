@@ -1,0 +1,150 @@
+name: Deploy JAR and React Files
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    # Setup Node.js for React build
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    # Setup Java for Spring Boot build
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    # Build Spring Boot JAR
+    - name: Build Spring Boot
+      run: |
+        cd RentThis
+        ./mvnw clean package -DskipTests
+        echo "Spring Boot JAR built"
+        ls -la target/RentThis-0.0.1-SNAPSHOT.jar
+    
+    # Build React app
+    - name: Build React
+      run: |
+        cd RentFrontend
+        npm install
+        npm run build
+        echo "React app built"
+        ls -la dist/
+    
+    # Create environment file for production
+    - name: Create production environment file
+      run: |
+        cat << EOF > .env.production
+        # Database
+        DATABASE_URL=jdbc:postgresql://localhost:5432/ridify
+        DATABASE_USERNAME=postgres
+        DATABASE_PASSWORD=2445
+        
+        # JWT Secrets
+        JWT_ACCESS_SECRET=${{ secrets.JWT_ACCESS_SECRET }}
+        ACCESS_EXPIRY=${{ secrets.ACCESS_EXPIRY }}
+        JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
+        REFRESH_EXPIRY=${{ secrets.REFRESH_EXPIRY }}
+        
+        # Khalti Payment
+        KHALTI_SECRET=${{ secrets.KHALTI_SECRET }}
+        KHATLTI_PUBLIC=${{ secrets.KHATLTI_PUBLIC }}
+        KHALTI_CALLBACK=${{ secrets.KHALTI_CALLBACK }}
+        
+        SPRING_PROFILES_ACTIVE=prod
+        EOF
+    
+    # Copy JAR file to EC2
+    - name: Copy JAR to EC2
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        source: "RentThis/target/RentThis-0.0.1-SNAPSHOT.jar"
+        target: "/tmp/deploy/"
+        
+    # Copy React dist to EC2
+    - name: Copy React files to EC2
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        source: "RentFrontend/dist"
+        target: "/tmp/deploy/"
+        
+    # Copy environment file to EC2
+    - name: Copy environment file to EC2
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        source: ".env.production"
+        target: "/tmp/deploy/"
+    
+    # Deploy and start services on EC2
+    - name: Deploy on EC2
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          echo "Starting deployment..."
+          
+          # Stop existing Spring Boot app
+          sudo pkill -f "RentThis-0.0.1-SNAPSHOT.jar" || echo "No existing app running"
+          
+          # Create directories
+          sudo mkdir -p /opt/rentthis
+          sudo mkdir -p /var/www/html
+          
+          # Copy JAR to app directory
+          sudo cp /tmp/deploy/RentThis/target/RentThis-0.0.1-SNAPSHOT.jar /opt/rentthis/app.jar
+          
+          # Copy React files to nginx directory
+          sudo rm -rf /var/www/html/*
+          sudo cp -r /tmp/deploy/RentFrontend/dist/* /var/www/html/
+          
+          # Copy environment file
+          sudo cp /tmp/deploy/.env.production /opt/rentthis/.env
+          
+          # Set permissions
+          sudo chown -R $USER:$USER /opt/rentthis
+          sudo chown -R www-data:www-data /var/www/html
+          
+          # Start Spring Boot app with environment file
+          cd /opt/rentthis
+          export $(cat .env | xargs)
+          nohup java -jar app.jar > app.log 2>&1 &
+          
+          # Start nginx if not running
+          sudo systemctl start nginx
+          sudo systemctl enable nginx
+          
+          echo "Deployment completed!"
+          echo "Frontend: http://${{ secrets.EC2_HOST }}"
+          echo "Backend: http://${{ secrets.EC2_HOST }}:8080"
+          
+          # Wait a bit and check if app started
+          sleep 10
+          if pgrep -f "app.jar"; then
+            echo "Spring Boot app is running"
+          else
+            echo "Spring Boot app failed to start. Check logs:"
+            tail /opt/rentthis/app.log
+          fi
