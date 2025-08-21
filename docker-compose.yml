@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 2445
     ports:
-      - "5433:5432"
+      - "5432:5432"  # Fixed: use standard port
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -21,44 +21,51 @@ services:
       retries: 5
     restart: unless-stopped
 
-  backend:
-    build:
-      context: ./RentThis
-      dockerfile: Dockerfile
+  backend:  # Fixed: added proper indentation
+    image: rentthis-backend:latest
     container_name: rentthis-backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/ridify
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: 2445
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_PROFILES_ACTIVE: docker
+      # Database configuration - Fixed to match your database service
+      DATABASE_URL: jdbc:postgresql://database:5432/ridify
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: 2445
+      
+      # JWT configuration
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      ACCESS_EXPIRY: ${ACCESS_EXPIRY}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      REFRESH_EXPIRY: ${REFRESH_EXPIRY}
+      
+      # Khalti payment configuration
+      KHALTI_SECRET: ${KHALTI_SECRET}
+      KHATLTI_PUBLIC: ${KHATLTI_PUBLIC}
+      KHALTI_CALLBACK: ${KHALTI_CALLBACK}
+      
+      SPRING_PROFILES_ACTIVE: prod
     ports:
       - "8080:8080"
+    volumes:
+      - uploads_data:/app/uploads
     depends_on:
-      database:
+      database:  # Fixed: should depend on 'database' service
         condition: service_healthy
     networks:
-      - ridify_network
-    restart: unless-stopped
+      - ridify_network  # Fixed: use same network name
 
   frontend:
-    build:
-      context: ./RentFrontend
-      dockerfile: Dockerfile
+    image: rentthis-frontend:latest
     container_name: rentthis-frontend
-    # environment:
-    #   - REACT_APP_API_URL=http://localhost:8080
     ports:
-      - "3000:80"
+      - "80:80"
     depends_on:
       - backend
     networks:
-      - ridify_network
-    restart: unless-stopped
-
-networks:
-  ridify_network:
-    driver: bridge
+      - ridify_network  # Fixed: use same network name
 
 volumes:
   postgres_data:
+  uploads_data:
+
+networks:
+  ridify_network:  # Fixed: consistent network name
+    driver: bridge

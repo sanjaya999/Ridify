@@ -1,23 +1,15 @@
-FROM node:18-alpine AS build
-
+FROM node:22-alpine AS build
 WORKDIR /app
-
 COPY package*.json ./
+<<<<<<< HEAD
+RUN npm install
+=======
 
-RUN npm ci --only= production
 
+>>>>>>> d283ae9 (Update environment variables and refactor Upload component for hardcoded location)
 COPY . .
-
 RUN npm run build
 
 FROM nginx:alpine
-
 COPY --from=build /app/dist /usr/share/nginx/html
-
-COPY nginx.conf /etc/nginx/nginx.conf
-
 EXPOSE 80
-
-CMD ["nginx" , "-g" , "daemon off;"]
-
-
