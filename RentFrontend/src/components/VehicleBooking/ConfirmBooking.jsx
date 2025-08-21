@@ -5,7 +5,7 @@ import { post } from '../../api/api';
 import { useOutletContext } from 'react-router-dom';
 
 
-const API_BASE_URL =  'http://localhost:8080';
+const API_BASE_URL =  'https://rentthis-dawn-shape-1905.fly.dev';
 
 const ConfirmBooking = () => {
   const { refreshWalletBalance } = useOutletContext() || {};

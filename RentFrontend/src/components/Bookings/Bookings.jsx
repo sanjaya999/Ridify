@@ -114,7 +114,7 @@ const Booking = () => {
               <CardMedia
                 component="img"
                 sx={{ width: 200, height: '100%', objectFit: 'cover' }}
-                image={`http://localhost:8080/${booking.vehicle.photoUrl}`}
+                image={`https://rentthis-dawn-shape-1905.fly.dev/${booking.vehicle.photoUrl}`}
                 alt={booking.vehicle.name}
               />
               <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>

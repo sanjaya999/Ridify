@@ -7,7 +7,7 @@ import '../../assets/styles/VehicleDetail.css';
 import { get, post } from '../../api/api';
 import GeoLocation from "../GeoLocation.jsx";
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'https://rentthis-dawn-shape-1905.fly.dev';
 
 const getVehicle = async (id) => {
   try {

@@ -7,7 +7,7 @@ const apiClient = axios.create({
 
 // A separate, clean Axios instance for the refresh token call
 const refreshApiClient = axios.create({
-    baseURL: "http://localhost:8080",
+    baseURL: "https://rentthis-dawn-shape-1905.fly.dev",
 });
 
 let isRefreshing = false;
