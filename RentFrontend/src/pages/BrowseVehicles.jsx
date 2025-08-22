@@ -86,7 +86,7 @@ const BrowseVehicles = () => {
               <div key={vehicle.id} className="vehicle-card">
                 <div className="vehicle-image-container">
                   <img
-                    src={`https://rentthis-dawn-shape-1905.fly.dev/${vehicle.photoUrl}`}
+                    src={`${vehicle.photoUrl}`}
                     alt={vehicle.name}
                     className="vehicle-image"
                     onError={handleImageError}

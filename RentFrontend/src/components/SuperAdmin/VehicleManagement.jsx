@@ -255,7 +255,7 @@ const VehicleManagement = () => {
                   <TableCell sx={{ color: '#e0e0e0' }}>{vehicle.id}</TableCell>
                   <TableCell>
                     <Avatar 
-                      src={`https://rentthis-dawn-shape-1905.fly.dev/${vehicle.photoUrl}`} 
+                      src={`${vehicle.photoUrl}`} 
                       alt={vehicle.name}
                       variant="rounded"
                       sx={{ 

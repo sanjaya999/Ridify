@@ -114,7 +114,7 @@ const SearchBar = ({ fullWidth = false, onSearch, closeMobileMenu }) => {
             >
               <div className="search-result-content">
                 <img
-                  src={`https://rentthis-dawn-shape-1905.fly.dev/${vehicle.photoUrl}`}
+                  src={`${vehicle.photoUrl}`}
                   alt={vehicle.name}
                   className="search-result-image"
                   onError={(e) => {

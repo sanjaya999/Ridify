@@ -5,7 +5,6 @@ import { post } from '../../api/api';
 import { useOutletContext } from 'react-router-dom';
 
 
-const API_BASE_URL =  'https://rentthis-dawn-shape-1905.fly.dev';
 
 const ConfirmBooking = () => {
   const { refreshWalletBalance } = useOutletContext() || {};
@@ -144,7 +143,7 @@ const ConfirmBooking = () => {
           <div className="vehicle-summary">
             {vehiclePhotoUrl && (
                 <img
-                    src={`${API_BASE_URL}/${vehiclePhotoUrl.startsWith('/') ? vehiclePhotoUrl.substring(1) : vehiclePhotoUrl}`}
+                    src={`${vehiclePhotoUrl}`}
                     alt={vehicleName}
                     onError={(e) => { e.target.style.display = 'none'; }}
                 />

@@ -170,7 +170,7 @@ function GeoLocation(startTime , endTime) {
                             <div className="vehicle-image-container">
                                 {vehicle.photoUrl ? (
                                     <img
-                                        src={`https://rentthis-dawn-shape-1905.fly.dev/${vehicle.photoUrl}`}
+                                        src={`${vehicle.photoUrl}`}
                                         alt={vehicle.name}
                                         className="vehicle-image"
                                         onError={(e) => {

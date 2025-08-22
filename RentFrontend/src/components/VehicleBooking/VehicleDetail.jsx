@@ -7,7 +7,6 @@ import '../../assets/styles/VehicleDetail.css';
 import { get, post } from '../../api/api';
 import GeoLocation from "../GeoLocation.jsx";
 
-const API_BASE_URL = 'https://rentthis-dawn-shape-1905.fly.dev';
 
 const getVehicle = async (id) => {
   try {
@@ -227,7 +226,7 @@ const VehicleDetail = () => {
             <h1>{vehicle.name}</h1>
             {vehicle.photoUrl && (
                 <img
-                    src={`${API_BASE_URL}/${vehicle.photoUrl.startsWith('/') ? vehicle.photoUrl.substring(1) : vehicle.photoUrl}`}
+                    src={`${vehicle.photoUrl}`}
                     alt={vehicle.name}
                     className="vehicle-image"
                     onError={(e) => { e.target.style.display = 'none'; }}

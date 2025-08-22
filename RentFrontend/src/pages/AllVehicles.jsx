@@ -126,7 +126,7 @@ const AllVehicles = () => {
                 style={{ cursor: 'pointer' }}
               >
                 <img
-                  src={`https://rentthis-dawn-shape-1905.fly.dev/${vehicle.photoUrl}`}
+                  src={`${vehicle.photoUrl}`}
                   alt={vehicle.name}
                   className="vehicle-image"
                   onError={handleImageError}
